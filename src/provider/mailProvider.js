@@ -35,8 +35,9 @@ module.exports = class MailProvider {
         const mailData = {
             link: `${this.apiRootUrl}/user/activate/${emailValidationToken}`,
         };
+
         const mailTemplate = 'email-validation';
-        const mailSubject = 'Code Runners - Validação de e-mail';
+        const mailSubject = 'Verificação de e-mail';
         this.send(mailTemplate, mailData, mailSubject, userEmail);
     }
 };
