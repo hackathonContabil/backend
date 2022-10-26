@@ -1,0 +1,29 @@
+# Optional npm/yarn cache directory
+.npm
+*.log
+yarn.lock
+package-lock.json
+
+# Dependency directory
+node_modules
+
+# API keys and secrets
+.env
+
+# Editors
+*.iml
+*.ipr
+.idea
+.vscode
+modules.xml
+
+# OS metadata
+Thumbs.db
+.DS_Store
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent

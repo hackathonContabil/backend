@@ -1,0 +1,134 @@
+{
+	"info": {
+		"_postman_id": "e6f8a60d-0fab-43fe-8444-98532da646d9",
+		"name": "Hackathon",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "USER - Create",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Vinícius Crisol\",\n    \"email\": \"vinicius.crisol@g1.com\",\n    \"password\": \"123456\",\n    \"document\": \"43960222804\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER - List",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ2aW5pY2l1cy5jcmlzb2xAaG90bWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjY2NDgyOTg5LCJleHAiOjE2NjY0ODY1ODl9.lh5WEp0oHGxKopeDh_DBJU3Fnm4AfvyNZB0Fii0HKnw",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user?limit=5&page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "5"
+						},
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER - Authenticate",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"vinicius.crisol@hotmail.com\",\n    \"password\": \"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user/auth",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER - Activate",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user/activate/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZpbmljaXVzLmNyaXNvbEBnMS5jb20iLCJpYXQiOjE2NjY0ODY2NDEsImV4cCI6MTY2NjQ5MDI0MX0.eHj9dteskVV7o2lniWM2SOymy8GnERpdNKmMRHMJsaE",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"activate",
+						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZpbmljaXVzLmNyaXNvbEBnMS5jb20iLCJpYXQiOjE2NjY0ODY2NDEsImV4cCI6MTY2NjQ5MDI0MX0.eHj9dteskVV7o2lniWM2SOymy8GnERpdNKmMRHMJsaE"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
