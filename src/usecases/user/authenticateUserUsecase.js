@@ -10,7 +10,6 @@ module.exports = class AuthenticateUserUsecase {
     async execute({ email, password }) {
         const encryptedEmail = this.cryptoProvider.encrypt(email);
         const user = await this.userRepository.findByEmail(encryptedEmail);
-
         if (!user || !user.isActive) {
             throw new BadRequestError('invalid-credentials');
         }
@@ -19,6 +18,18 @@ module.exports = class AuthenticateUserUsecase {
         if (!passwordIsValid) {
             throw new BadRequestError('invalid-credentials');
         }
-        return this.tokenProvider.create({ id: user.id, email, isAdmin: user.isAdmin });
+        const token = this.tokenProvider.create({
+            id: user.id,
+            email,
+            isAdmin: user.isAdmin,
+            isAccountant: user.isAccountant,
+            isSharingBankAccountData: user.isSharingBankAccountData,
+        });
+        return {
+            token,
+            isAdmin: user.isAdmin,
+            isAccountant: user.isAccountant,
+            isSharingBankAccountData: user.isSharingBankAccountData,
+        };
     }
 };

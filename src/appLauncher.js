@@ -5,12 +5,16 @@ const compression = require('compression');
 const { engine } = require('express-handlebars');
 const { Sequelize } = require('sequelize');
 const errorHandler = require('./api/middlewares/errorHandler');
+const BankAccountDataProvider = require('./providers/bankAccountDataProvider');
 const CryptoProvider = require('./providers/cryptoProvider');
 const MailProvider = require('./providers/mailProvider');
 const SpreadsheetProvider = require('./providers/spreadsheetProvider');
 const TokenProvider = require('./providers/tokenProvider');
-const BankAccount = require('./models/bankAccount');
-const ExportTransactionsUsecase = require('./usecases/bankAccount/exportTransactionsUsecase');
+const BankAccountConnector = require('./models/bankAccountConnector');
+const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
+const BankAccountController = require('./api/bankAccountController');
+const BankAccountConnectorRepository = require('./repositories/bankAccountConnectorRepository');
+const ExportTransactionsDataSpreadsheet = require('./usecases/bankAccount/exportTransactionsDataSpreadsheet');
 const User = require('./models/user');
 const ActivateUserAccountUsecase = require('./usecases/user/activateUserAccountUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
@@ -54,9 +58,9 @@ module.exports = class AppLauncher {
             const sequelize = new Sequelize(this.mainDatabaseUrl, { logging: false });
             await sequelize.authenticate();
 
-            BankAccount.init(sequelize);
+            BankAccountConnector.init(sequelize);
             User.init(sequelize);
-            User.hasMany(BankAccount);
+            User.hasMany(BankAccountConnector, { foreignKey: 'userId' });
 
             await sequelize.sync();
         } catch (error) {
@@ -66,13 +70,14 @@ module.exports = class AppLauncher {
     }
 
     async initModulesRoutesAndSchedules() {
-        // Providers
+        // Dependencies
+        const bankAccountDataProvider = new BankAccountDataProvider();
         const cryptoProvider = new CryptoProvider();
         const mailProvider = new MailProvider();
         const spreadsheetProvider = new SpreadsheetProvider();
         const tokenProvider = new TokenProvider();
-        // Repositories
         const userRepository = new UserRepository();
+        const bankAccountConnectorRepository = new BankAccountConnectorRepository();
 
         // User modules
         const activateUserAccountUsecase = new ActivateUserAccountUsecase(
@@ -105,11 +110,21 @@ module.exports = class AppLauncher {
         );
         this.expressServer.use('/api/v1/user', userController.router());
 
-        const exportTransactionsUsecase = new ExportTransactionsUsecase(
+        //  Bank account modules
+        const connectBankAccountUsecase = new ConnectBankAccountUsecase(
+            bankAccountConnectorRepository,
+            cryptoProvider,
+            bankAccountDataProvider
+        );
+        const bankAccountController = new BankAccountController(connectBankAccountUsecase);
+        this.expressServer.use('/api/v1/bank-account', bankAccountController.router());
+
+        // File modules
+        const exportTransactionsDataSpreadsheet = new ExportTransactionsDataSpreadsheet(
             tokenProvider,
             spreadsheetProvider
         );
-        const fileController = new FileController(exportTransactionsUsecase);
+        const fileController = new FileController(exportTransactionsDataSpreadsheet);
         this.expressServer.use('/api/v1/file', fileController.router());
     }
 };
