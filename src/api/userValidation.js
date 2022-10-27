@@ -5,7 +5,7 @@ const createUserValidation = validate({
         name: joi.string().required().label('Nome').min(8).max(128),
         email: joi.string().email().required().label('E-mail').max(128),
         password: joi.string().required().label('Senha').min(8).max(128),
-        document: joi.string().required().label('Documento').length(14),
+        document: joi.string().label('Documento').length(14),
     },
 });
 

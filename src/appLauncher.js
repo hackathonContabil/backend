@@ -6,8 +6,11 @@ const { engine } = require('express-handlebars');
 const { Sequelize } = require('sequelize');
 const errorHandler = require('./api/middlewares/errorHandler');
 const CryptoProvider = require('./providers/cryptoProvider');
-const TokenProvider = require('./providers/tokenProvider');
 const MailProvider = require('./providers/mailProvider');
+const SpreadsheetProvider = require('./providers/spreadsheetProvider');
+const TokenProvider = require('./providers/tokenProvider');
+const BankAccount = require('./models/bankAccount');
+const ExportTransactionsUsecase = require('./usecases/bankAccount/exportTransactionsUsecase');
 const User = require('./models/user');
 const ActivateUserAccountUsecase = require('./usecases/user/activateUserAccountUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
@@ -17,6 +20,7 @@ const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
 const UserController = require('./api/userController');
 const UserScheduler = require('./scheduler/userScheduler');
 const UserRepository = require('./repositories/userRepository');
+const FileController = require('./api/fileController');
 
 module.exports = class AppLauncher {
     httpServerPort = process.env.HTTP_SERVER_PORT;
@@ -36,7 +40,7 @@ module.exports = class AppLauncher {
         this.expressServer.set('views', join(__dirname, 'views', 'pages'));
 
         await this.initSequelizeMainDatabaseConnection();
-        await this.initModulesSchedulesAndExpressRoutes();
+        await this.initModulesRoutesAndSchedules();
 
         this.expressServer.use(errorHandler);
 
@@ -50,7 +54,9 @@ module.exports = class AppLauncher {
             const sequelize = new Sequelize(this.mainDatabaseUrl, { logging: false });
             await sequelize.authenticate();
 
+            BankAccount.init(sequelize);
             User.init(sequelize);
+            User.hasMany(BankAccount);
 
             await sequelize.sync();
         } catch (error) {
@@ -59,12 +65,16 @@ module.exports = class AppLauncher {
         }
     }
 
-    async initModulesSchedulesAndExpressRoutes() {
-        const userRepository = new UserRepository();
+    async initModulesRoutesAndSchedules() {
+        // Providers
         const cryptoProvider = new CryptoProvider();
-        const tokenProvider = new TokenProvider();
         const mailProvider = new MailProvider();
+        const spreadsheetProvider = new SpreadsheetProvider();
+        const tokenProvider = new TokenProvider();
+        // Repositories
+        const userRepository = new UserRepository();
 
+        // User modules
         const activateUserAccountUsecase = new ActivateUserAccountUsecase(
             userRepository,
             cryptoProvider,
@@ -94,5 +104,12 @@ module.exports = class AppLauncher {
             listUsersUsecase
         );
         this.expressServer.use('/api/v1/user', userController.router());
+
+        const exportTransactionsUsecase = new ExportTransactionsUsecase(
+            tokenProvider,
+            spreadsheetProvider
+        );
+        const fileController = new FileController(exportTransactionsUsecase);
+        this.expressServer.use('/api/v1/file', fileController.router());
     }
 };

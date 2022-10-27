@@ -6,7 +6,7 @@ module.exports = class UserScheduler {
     }
 
     init() {
-        schedule.scheduleJob('* 15 * * * *', () => {
+        schedule.scheduleJob('* 5 * * * *', () => {
             this.deleteExpiredNonActiveUsers.execute();
         });
     }
