@@ -6,13 +6,13 @@
 	},
 	"item": [
 		{
-			"name": "USER - Create",
+			"name": "USER - Create client",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Vinícius Crisol\",\n    \"email\": \"vinicius.crisol@g1.com\",\n    \"password\": \"123456\",\n    \"document\": \"43960222804\"\n}",
+					"raw": "{\n    \"name\": \"Vinícius Crisol\",\n    \"email\": \"vini2ius.criso31@hotmail.com\",\n    \"password\": \"12345678\",\n    \"document\": \"12345623654332\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -20,7 +20,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/v1/user",
+					"raw": "http://localhost:3000/api/v1/user/client",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -29,7 +29,71 @@
 					"path": [
 						"api",
 						"v1",
-						"user"
+						"user",
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER - Create admin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user/admin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"admin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER - Create accountant",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJpc0FkbWluIjp0cnVlLCJpc0FjY291bnRhbnQiOnRydWUsImlzU2hhcmluZ0JhbmtBY2NvdW50RGF0YSI6ZmFsc2UsImlhdCI6MTY2NjkwNTAwNCwiZXhwIjoxNjY2OTkxNDA0fQ.NY_3pN4v7lmc_nTlI2CuMjFVOhLZ9oOKguB4uHxB5xc",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Vinícius Crisol\",\n    \"email\": \"vinicius.crisol@hotmail.com\",\n    \"password\": \"12345678\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/user/accountant",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"user",
+						"accountant"
 					]
 				}
 			},
@@ -43,7 +107,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ2aW5pY2l1cy5jcmlzb2xAaG90bWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjY2NDgyOTg5LCJleHAiOjE2NjY0ODY1ODl9.lh5WEp0oHGxKopeDh_DBJU3Fnm4AfvyNZB0Fii0HKnw",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJhZG1pbkBhZG1pbi5jb20iLCJpc0FkbWluIjp0cnVlLCJpc0FjY291bnRhbnQiOnRydWUsImlzU2hhcmluZ0JhbmtBY2NvdW50RGF0YSI6ZmFsc2UsImlhdCI6MTY2NjkwNTAwNCwiZXhwIjoxNjY2OTkxNDA0fQ.NY_3pN4v7lmc_nTlI2CuMjFVOhLZ9oOKguB4uHxB5xc",
 							"type": "string"
 						}
 					]
@@ -83,7 +147,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"vinicius.crisol@hotmail.com\",\n    \"password\": \"123456\"\n}",
+					"raw": "{\n    \"email\": \"admin@admin.com\",\n    \"password\": \"admin@admin\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -125,6 +189,67 @@
 						"user",
 						"activate",
 						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZpbmljaXVzLmNyaXNvbEBnMS5jb20iLCJpYXQiOjE2NjY0ODY2NDEsImV4cCI6MTY2NjQ5MDI0MX0.eHj9dteskVV7o2lniWM2SOymy8GnERpdNKmMRHMJsaE"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "BANK ACCOUNT - Create bank connection",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJ2aW5pY2l1cy5jcmlzb2xAaG90bWFpbC5jb20iLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjY2OTAxNzU4LCJleHAiOjE2NjY5ODgxNTh9.l36U4oEYoaZ6pM5AoHcQStbfvD7YGGruv-lJVNKMYqE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": 1,\n    \"bank\": \"SANDBOX\",\n    \"credentials\": {\n        \"user\": \"teste\",\n        \"password\": \"teste\"\n    }  \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/v1/bank-account",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"bank-account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FILES - Download spreadsheet",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/api/v1/file/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ2aW5pY2l1cy5jcmlzb2wyQGhvdG1haWwuY29tIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTY2Njg5NzI2NywiZXhwIjoxNjY2OTgzNjY3fQ.ah5BzOlt7c00BVtMOMbi-zf7cQ76DefQfqm6IqX0XOQ",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"v1",
+						"file",
+						"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ2aW5pY2l1cy5jcmlzb2wyQGhvdG1haWwuY29tIiwiaXNBZG1pbiI6ZmFsc2UsImlhdCI6MTY2Njg5NzI2NywiZXhwIjoxNjY2OTgzNjY3fQ.ah5BzOlt7c00BVtMOMbi-zf7cQ76DefQfqm6IqX0XOQ"
 					]
 				}
 			},

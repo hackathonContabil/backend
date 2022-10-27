@@ -8,14 +8,14 @@ module.exports = class CreateUserUsecase {
         this.mailProvider = mailProvider;
     }
 
-    async execute({ name, email, password, document }) {
+    async execute({ name, email, password, document, isAdmin, isActive, isAccountant }) {
         const passwordHash = this.cryptoProvider.hash(password);
         const encryptedEmail = this.cryptoProvider.encrypt(email);
-        const encryptedDocument = this.cryptoProvider.encrypt(document);
+        const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
 
         const [userWithSameEmail, userWithSameDocument] = await Promise.all([
             this.userRepository.findByEmail(encryptedEmail),
-            this.userRepository.findByDocument(encryptedDocument),
+            this.findUserByDocumentIfItsNotNull(encryptedDocument),
         ]);
         if (userWithSameEmail || userWithSameDocument) {
             throw new BadRequestError('invalid-credentials');
@@ -25,7 +25,11 @@ module.exports = class CreateUserUsecase {
             name,
             email: encryptedEmail,
             password: passwordHash,
-            document: encryptedDocument,
+            document: document ? encryptedDocument : null,
+            isAdmin,
+            isActive,
+            activatedAt: isActive ? Date.now() : null,
+            isAccountant,
         });
         this.sendValidationMail(email);
         return user;
@@ -34,5 +38,13 @@ module.exports = class CreateUserUsecase {
     sendValidationMail(email) {
         const validationToken = this.tokenProvider.create({ email });
         this.mailProvider.sendValidationMail(validationToken, email);
+    }
+
+    async findUserByDocumentIfItsNotNull(document) {
+        if (!document) {
+            return;
+        }
+        const userWithSameDocument = await this.userRepository.findByDocument(document);
+        return userWithSameDocument;
     }
 };

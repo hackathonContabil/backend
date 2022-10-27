@@ -8,7 +8,7 @@ module.exports = class ListUsersUsecase {
         const { total, users } = await this.userRepository.list(
             page,
             limit,
-            filter && this.cryptoProvider.encrypt(filter)
+            filter ? this.cryptoProvider.encrypt(filter) : null
         );
         return {
             total,
@@ -18,12 +18,10 @@ module.exports = class ListUsersUsecase {
 
     decryptUserData(users) {
         return users.map(({ email, document, ...userData }) => {
-            const decryptedEmail = this.cryptoProvider.decrypt(email);
-            const decryptedDocument = this.cryptoProvider.decrypt(document);
             return {
                 ...userData,
-                email: decryptedEmail,
-                document: decryptedDocument,
+                email: this.cryptoProvider.decrypt(email),
+                document: document ? this.cryptoProvider.decrypt(document) : null,
             };
         });
     }

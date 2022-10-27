@@ -5,7 +5,7 @@ module.exports = class SpreadsheetProvider {
         const options = {
             fields: ['field1', 'field2', 'field3'],
         };
-        const csv = parse(transactions, options);
-        return csv;
+        const spreadsheet = parse(transactions, options);
+        return spreadsheet;
     }
 };
