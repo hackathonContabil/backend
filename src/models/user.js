@@ -52,6 +52,10 @@ module.exports = class User extends Model {
                     defaultValue: false,
                     allowNull: false,
                 },
+                acceptedShareBankAccountDataAt: {
+                    type: DataTypes.DATE,
+                    allowNull: true,
+                },
             },
             { tableName: 'users', sequelize, timestamps: true }
         );

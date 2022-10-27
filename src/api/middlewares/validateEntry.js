@@ -6,11 +6,13 @@ function validate(entry) {
         const errorMessages = [];
         for (const segment in entry) {
             const validator = joi.object().keys(entry[segment]);
-            const { error } = validator.validate(req[segment], { messages });
+            const { error } = validator.validate(req[segment], { messages, abortEarly: false });
             if (!error) {
                 continue;
             }
-            errorMessages.push(error.details[0].message);
+            error.details.forEach((validationError) => {
+                errorMessages.push(validationError.message);
+            });
         }
 
         if (errorMessages.length !== 0) {
