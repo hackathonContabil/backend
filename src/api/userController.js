@@ -5,8 +5,8 @@ const {
     createUserValidation,
     listUsersValidation,
 } = require('./userValidation');
-const ensureUserIsAdmin = require('./middleware/ensureUserIsAdmin');
-const ensureAuthentication = require('./middleware/ensureAuthentication');
+const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
+const ensureAuthentication = require('./middlewares/ensureAuthentication');
 
 module.exports = class UserController {
     constructor(

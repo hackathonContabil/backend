@@ -1,6 +1,6 @@
 const { verify } = require('jsonwebtoken');
-const UserRepository = require('../../repository/userRepository');
-const UnauthorizedError = require('../../error/unauthorizedError');
+const UserRepository = require('../../repositories/userRepository');
+const UnauthorizedError = require('../../errors/unauthorizedError');
 
 module.exports = async (req, _res, next) => {
     const authHeader = req.headers.authorization;

@@ -1,6 +1,6 @@
-const messages = require('../../error/messages');
-const BadRequestError = require('../../error/badRequestError');
-const UnauthorizedError = require('../../error/unauthorizedError');
+const messages = require('../../errors/messages');
+const BadRequestError = require('../../errors/badRequestError');
+const UnauthorizedError = require('../../errors/unauthorizedError');
 
 module.exports = (error, _req, res, _next) => {
     if (error instanceof BadRequestError || error instanceof UnauthorizedError) {

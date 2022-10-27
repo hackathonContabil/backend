@@ -1,5 +1,3 @@
-const { applyHideDocumentDataMask } = require('../../helper');
-
 module.exports = class ListUsersUsecase {
     constructor(userRepository, cryptoProvider) {
         this.userRepository = userRepository;
@@ -25,7 +23,7 @@ module.exports = class ListUsersUsecase {
             return {
                 ...userData,
                 email: decryptedEmail,
-                document: applyHideDocumentDataMask(decryptedDocument),
+                document: decryptedDocument,
             };
         });
     }

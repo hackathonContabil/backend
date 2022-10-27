@@ -26,6 +26,11 @@ module.exports = class User extends Model {
                 document: {
                     type: DataTypes.STRING(32),
                     unique: true,
+                    allowNull: true,
+                },
+                isAdmin: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
                     allowNull: false,
                 },
                 isActive: {
@@ -33,14 +38,19 @@ module.exports = class User extends Model {
                     defaultValue: false,
                     allowNull: false,
                 },
-                isAdmin: {
+                activatedAt: {
+                    type: DataTypes.DATE,
+                    allowNull: true,
+                },
+                isAccountant: {
                     type: DataTypes.BOOLEAN,
                     defaultValue: false,
                     allowNull: false,
                 },
-                activatedAt: {
-                    type: DataTypes.DATE,
-                    allowNull: true,
+                isSharingBankAccountData: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
+                    allowNull: false,
                 },
             },
             { tableName: 'users', sequelize, timestamps: true }

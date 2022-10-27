@@ -1,4 +1,4 @@
-const BadRequestError = require('../../error/badRequestError');
+const BadRequestError = require('../../errors/badRequestError');
 
 module.exports = class CreateUserUsecase {
     constructor(userRepository, cryptoProvider, tokenProvider, mailProvider) {

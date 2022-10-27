@@ -1,7 +1,7 @@
-const UnauthorizedError = require('../../error/unauthorizedError');
+const UnauthorizedError = require('../../errors/unauthorizedError');
 
 module.exports = (req, _res, next) => {
-    if (!req.user.isAdmin) {
+    if (!req.user.isAccountant) {
         throw new UnauthorizedError('invalid-credentials');
     }
     next();

@@ -20,7 +20,7 @@ module.exports = class MailProvider {
     }
 
     getMailTemplate(template, templateData) {
-        const mailTemplateDir = join(__dirname, '..', 'email', `${template}.handlebars`);
+        const mailTemplateDir = join(__dirname, '..', 'views', 'emails', `${template}.handlebars`);
         const mailTemplateFile = readFileSync(mailTemplateDir).toString();
         const mailTemplateCompiler = compileTemplate(mailTemplateFile, 'utf8');
         return mailTemplateCompiler(templateData);
