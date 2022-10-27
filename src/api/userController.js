@@ -25,9 +25,9 @@ module.exports = class UserController {
         const router = Router();
         router.get(
             '/',
+            listUsersValidation,
             ensureAuthentication,
             ensureUserIsAdmin,
-            listUsersValidation,
             async (req, res) => {
                 const { page, limit, filter } = req.query;
 
@@ -54,11 +54,11 @@ module.exports = class UserController {
         router.post('/auth', authenticateUserValidation, async (req, res) => {
             const { email, password } = req.body;
 
-            const authenticationToken = await this.authenticateUserUsecase.execute({
+            const authenticationData = await this.authenticateUserUsecase.execute({
                 email: normalizeEmail(email),
                 password,
             });
-            return res.json({ status: 'success', data: { token: authenticationToken } });
+            return res.json({ status: 'success', data: { ...authenticationData } });
         });
 
         router.get('/activate/:token', async (req, res) => {
