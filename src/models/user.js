@@ -47,6 +47,17 @@ module.exports = class User extends Model {
                     defaultValue: false,
                     allowNull: false,
                 },
+                accountantState: {
+                    type: DataTypes.STRING(2),
+                    allowNull: true,
+                },
+                accountingOfficeId: {
+                    type: DataTypes.INTEGER,
+                    references: {
+                        key: 'id',
+                        model: 'accountingOffices',
+                    },
+                },
                 isSharingBankAccountData: {
                     type: DataTypes.BOOLEAN,
                     defaultValue: false,

@@ -8,7 +8,16 @@ module.exports = class CreateUserUsecase {
         this.mailProvider = mailProvider;
     }
 
-    async execute({ name, email, password, document, isAdmin, isActive, isAccountant }) {
+    async execute({
+        name,
+        email,
+        password,
+        document,
+        isAdmin,
+        isAccountant,
+        accountantState,
+        accountingOfficeId,
+    }) {
         const passwordHash = this.cryptoProvider.hash(password);
         const encryptedEmail = this.cryptoProvider.encrypt(email);
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
@@ -27,17 +36,12 @@ module.exports = class CreateUserUsecase {
             password: passwordHash,
             document: document ? encryptedDocument : null,
             isAdmin,
-            isActive,
-            activatedAt: isActive ? Date.now() : null,
             isAccountant,
+            accountantState,
+            accountingOfficeId,
         });
         this.sendValidationMail(email);
         return user;
-    }
-
-    sendValidationMail(email) {
-        const validationToken = this.tokenProvider.create({ email });
-        this.mailProvider.sendValidationMail(validationToken, email);
     }
 
     async findUserByDocumentIfItsNotNull(document) {
@@ -46,5 +50,10 @@ module.exports = class CreateUserUsecase {
         }
         const userWithSameDocument = await this.userRepository.findByDocument(document);
         return userWithSameDocument;
+    }
+
+    sendValidationMail(email) {
+        const validationToken = this.tokenProvider.create({ email });
+        this.mailProvider.sendActivateAccountMail(validationToken, email);
     }
 };

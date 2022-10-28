@@ -3,6 +3,7 @@ const { normalizeEmail } = require('../helper');
 const {
     listUsersValidation,
     authenticateUserValidation,
+    createAdminUserValidation,
     createClientUserValidation,
     createAccountantUserValidation,
 } = require('./userValidation');
@@ -27,9 +28,9 @@ module.exports = class UserController {
         const router = Router();
         router.get(
             '/',
-            listUsersValidation,
             ensureAuthentication,
             ensureUserIsAccountant,
+            listUsersValidation,
             async (req, res) => {
                 const { page, limit, filter } = req.query;
 
@@ -48,19 +49,47 @@ module.exports = class UserController {
             return res.json({ status: 'success', data: { ...authenticationData } });
         });
 
-        router.post('/admin', async (_, res) => {
-            const user = await this.createUserUsecase.execute({
-                name: 'admin',
-                email: 'admin@admin.com',
-                password: 'admin@admin',
-                isAdmin: true,
-                isActive: true,
-                isAccountant: true,
-            });
-            delete user.email;
-            delete user.password;
-            return res.json({ status: 'success', data: { user } });
-        });
+        router.post(
+            '/admin',
+            ensureAuthentication,
+            ensureUserIsAdmin,
+            createAdminUserValidation,
+            async (req, res) => {
+                const { name, email, password } = req.body;
+
+                const user = await this.createUserUsecase.execute({
+                    name,
+                    email,
+                    password,
+                    isAdmin: true,
+                });
+                delete user.email;
+                delete user.password;
+                return res.json({ status: 'success', data: { user } });
+            }
+        );
+
+        router.post(
+            '/accountant',
+            ensureAuthentication,
+            ensureUserIsAdmin,
+            createAccountantUserValidation,
+            async (req, res) => {
+                const { name, email, password, accountantState, accountingOfficeId } = req.body;
+
+                const user = await this.createUserUsecase.execute({
+                    name,
+                    email: normalizeEmail(email),
+                    password,
+                    accountantState,
+                    accountingOfficeId,
+                    isAccountant: true,
+                });
+                delete user.email;
+                delete user.password;
+                return res.json({ status: 'success', data: { user } });
+            }
+        );
 
         router.post(
             '/client',
@@ -75,35 +104,10 @@ module.exports = class UserController {
                     email: normalizeEmail(email),
                     password,
                     document,
-                    isAdmin: false,
-                    isActive: false,
-                    isAccountant: false,
                 });
                 delete user.email;
                 delete user.password;
                 delete user.document;
-                return res.json({ status: 'success', data: { user } });
-            }
-        );
-
-        router.post(
-            '/accountant',
-            ensureAuthentication,
-            ensureUserIsAdmin,
-            createAccountantUserValidation,
-            async (req, res) => {
-                const { name, email, password } = req.body;
-
-                const user = await this.createUserUsecase.execute({
-                    name,
-                    email: normalizeEmail(email),
-                    password,
-                    isAdmin: false,
-                    isActive: false,
-                    isAccountant: true,
-                });
-                delete user.email;
-                delete user.password;
                 return res.json({ status: 'success', data: { user } });
             }
         );

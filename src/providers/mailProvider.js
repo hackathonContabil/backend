@@ -31,13 +31,13 @@ module.exports = class MailProvider {
         this.mailer.sendMail({ html: mail, from: this.mailDomain, subject, to });
     }
 
-    sendValidationMail(emailValidationToken, userEmail) {
+    sendActivateAccountMail(token, userEmail) {
         const mailData = {
-            link: `${this.apiRootUrl}/user/activate/${emailValidationToken}`,
+            link: `${this.apiRootUrl}/user/activate/${token}`,
         };
 
-        const mailTemplate = 'email-validation';
-        const mailSubject = 'Verificação de e-mail';
+        const mailTemplate = 'activate-account';
+        const mailSubject = 'E-mail para ativação de contas';
         this.send(mailTemplate, mailData, mailSubject, userEmail);
     }
 };

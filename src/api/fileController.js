@@ -4,6 +4,7 @@ module.exports = class FileController {
     constructor(exportTransactionsUsecase) {
         this.exportTransactionsUsecase = exportTransactionsUsecase;
     }
+
     router() {
         const router = Router();
 

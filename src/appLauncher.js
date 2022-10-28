@@ -5,26 +5,35 @@ const compression = require('compression');
 const { engine } = require('express-handlebars');
 const { Sequelize } = require('sequelize');
 const errorHandler = require('./api/middlewares/errorHandler');
+
+const AccountingOffice = require('./models/accountingOffice');
+const BankAccountConnector = require('./models/bankAccountConnector');
+const User = require('./models/user');
+
 const BankAccountDataProvider = require('./providers/bankAccountDataProvider');
 const CryptoProvider = require('./providers/cryptoProvider');
 const MailProvider = require('./providers/mailProvider');
 const SpreadsheetProvider = require('./providers/spreadsheetProvider');
 const TokenProvider = require('./providers/tokenProvider');
-const BankAccountConnector = require('./models/bankAccountConnector');
-const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
-const BankAccountController = require('./api/bankAccountController');
+
+const AccountingOfficeRepository = require('./repositories/accountingOfficeRepository');
 const BankAccountConnectorRepository = require('./repositories/bankAccountConnectorRepository');
+const UserRepository = require('./repositories/userRepository');
+
+const CreateAccountingOfficeUsecase = require('./usecases/accountOffice/createAccountingOfficeUsecase');
+const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
 const ExportTransactionsDataSpreadsheet = require('./usecases/bankAccount/exportTransactionsDataSpreadsheet');
-const User = require('./models/user');
+const BankAccountController = require('./api/bankAccountController');
 const ActivateUserAccountUsecase = require('./usecases/user/activateUserAccountUsecase');
+const AccountingOfficeController = require('./api/accountingOfficeController');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
 const DeleteExpiredNonActiveUsers = require('./usecases/user/deleteExpiredNonActiveUsers');
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
-const UserController = require('./api/userController');
+
 const UserScheduler = require('./scheduler/userScheduler');
-const UserRepository = require('./repositories/userRepository');
 const FileController = require('./api/fileController');
+const UserController = require('./api/userController');
 
 module.exports = class AppLauncher {
     httpServerPort = process.env.HTTP_SERVER_PORT;
@@ -58,9 +67,11 @@ module.exports = class AppLauncher {
             const sequelize = new Sequelize(this.mainDatabaseUrl, { logging: false });
             await sequelize.authenticate();
 
+            AccountingOffice.init(sequelize);
             BankAccountConnector.init(sequelize);
             User.init(sequelize);
             User.hasMany(BankAccountConnector, { foreignKey: 'userId' });
+            AccountingOffice.hasMany(User, { foreignKey: 'accountingOfficeId' });
 
             await sequelize.sync();
         } catch (error) {
@@ -76,9 +87,21 @@ module.exports = class AppLauncher {
         const mailProvider = new MailProvider();
         const spreadsheetProvider = new SpreadsheetProvider();
         const tokenProvider = new TokenProvider();
-        const userRepository = new UserRepository();
-        const bankAccountConnectorRepository = new BankAccountConnectorRepository();
 
+        const accountingOfficeRepository = new AccountingOfficeRepository();
+        const bankAccountConnectorRepository = new BankAccountConnectorRepository();
+        const userRepository = new UserRepository();
+
+        // Accounting Office modules
+        const createAccountingOfficeUsecase = new CreateAccountingOfficeUsecase(
+            accountingOfficeRepository
+        );
+        const accountingOfficeController = new AccountingOfficeController(
+            createAccountingOfficeUsecase
+        );
+        this.expressServer.use('/api/v1/accounting-office', accountingOfficeController.router());
+
+        AccountingOfficeController;
         // User modules
         const activateUserAccountUsecase = new ActivateUserAccountUsecase(
             userRepository,
