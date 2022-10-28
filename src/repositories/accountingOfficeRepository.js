@@ -20,4 +20,8 @@ module.exports = class {
         const office = await AccountingOffice.findOne({ where: { document } }, { raw: true });
         return office;
     }
+
+    async delete(id) {
+        await AccountingOffice.destroy({ where: { id } });
+    }
 };

@@ -57,7 +57,7 @@ module.exports = class {
             const { id } = req.params;
 
             await this.activateUserUsecase.execute(id);
-            return res.json({ status: 'success' });
+            return res.status(204).send();
         });
 
         router.get('/confirm-email/:token', async (req, res) => {
@@ -88,7 +88,7 @@ module.exports = class {
             delete user.password;
             delete user.document;
             delete user.isSharingBankAccountData;
-            return res.json({ status: 'success', data: { user } });
+            return res.status(201).json({ status: 'success', data: { user } });
         });
 
         router.post('/client', createClientUserValidation, async (req, res) => {
@@ -108,7 +108,7 @@ module.exports = class {
             delete user.password;
             delete user.document;
             delete user.accountantState;
-            return res.json({ status: 'success', data: { user } });
+            return res.status(201).json({ status: 'success', data: { user } });
         });
 
         router.post(
@@ -117,7 +117,7 @@ module.exports = class {
             ensureUserIsClient,
             async (req, res) => {
                 await this.allowToShareBankAccountDataUsecase.execute(req.user.id);
-                return res.json({ status: 'success' });
+                return res.status(204).send();
             }
         );
         return router;

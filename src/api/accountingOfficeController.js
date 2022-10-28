@@ -4,8 +4,9 @@ const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 
 module.exports = class {
-    constructor(createAccountingOfficeUsecase) {
+    constructor(createAccountingOfficeUsecase, deleteAccountingOfficeUsecase) {
         this.createAccountingOfficeUsecase = createAccountingOfficeUsecase;
+        this.deleteAccountingOfficeUsecase = deleteAccountingOfficeUsecase;
     }
 
     router() {
@@ -23,9 +24,16 @@ module.exports = class {
                     name,
                     document,
                 });
-                return res.json({ status: 'success', data: { accountingOffice } });
+                return res.status(201).json({ status: 'success', data: { accountingOffice } });
             }
         );
+
+        router.delete('/:id', ensureAuthentication, ensureUserIsAdmin, async (req, res) => {
+            const { id } = req.params;
+
+            await this.deleteAccountingOfficeUsecase.execute(id);
+            return res.status(204).send();
+        });
         return router;
     }
 };

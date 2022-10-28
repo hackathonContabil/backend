@@ -17,6 +17,7 @@ const AccountingOfficeRepository = require('./repositories/accountingOfficeRepos
 const BankAccountConnectorRepository = require('./repositories/bankAccountConnectorRepository');
 const UserRepository = require('./repositories/userRepository');
 const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/createAccountingOfficeUsecase');
+const DeleteAccountingOfficeUsecase = require('./usecases/accountingOffice/deleteAccountingOfficeUsecase');
 const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
 const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const BankAccountController = require('./api/bankAccountController');
@@ -68,7 +69,10 @@ module.exports = class AppLauncher {
             BankAccountConnector.init(sequelize);
             User.init(sequelize);
             User.hasMany(BankAccountConnector, { foreignKey: 'userId' });
-            AccountingOffice.hasMany(User, { foreignKey: 'accountingOfficeId' });
+            AccountingOffice.hasMany(User, {
+                onDelete: 'CASCADE',
+                foreignKey: 'accountingOfficeId',
+            });
 
             await sequelize.sync();
         } catch (error) {
@@ -93,8 +97,12 @@ module.exports = class AppLauncher {
             accountingOfficeRepository,
             cryptoProvider
         );
+        const deleteAccountingOfficeUsecase = new DeleteAccountingOfficeUsecase(
+            accountingOfficeRepository
+        );
         const accountingOfficeController = new AccountingOfficeController(
-            createAccountingOfficeUsecase
+            createAccountingOfficeUsecase,
+            deleteAccountingOfficeUsecase
         );
         this.expressServer.use('/api/v1/accounting-office', accountingOfficeController.router());
 
