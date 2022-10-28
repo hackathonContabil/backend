@@ -7,8 +7,9 @@ const {
     createAccountantUserValidation,
 } = require('./userValidation');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
-const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
+const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
+const ensureUserIsClient = require('./middlewares/ensureUserIsClient');
 
 module.exports = class {
     constructor(
@@ -16,13 +17,15 @@ module.exports = class {
         authenticateUserUsecase,
         confirmEmailUsecase,
         createUserUsecase,
-        listUsersUsecase
+        listUsersUsecase,
+        shareBankAccountDataUsecase
     ) {
         this.activateUserUsecase = activateUserUsecase;
         this.authenticateUserUsecase = authenticateUserUsecase;
         this.confirmEmailUsecase = confirmEmailUsecase;
         this.createUserUsecase = createUserUsecase;
         this.listUsersUsecase = listUsersUsecase;
+        this.shareBankAccountDataUsecase = shareBankAccountDataUsecase;
     }
 
     router() {
@@ -88,6 +91,16 @@ module.exports = class {
             delete user.accountantState;
             return res.json({ status: 'success', data: { user } });
         });
+
+        router.post(
+            '/client/share-bank-account-data',
+            ensureAuthentication,
+            ensureUserIsClient,
+            async (req, res) => {
+                await this.shareBankAccountDataUsecase.execute(req.user.id);
+                return res.json({ status: 'success' });
+            }
+        );
 
         router.get('/confirm-email/:token', async (req, res) => {
             const { token: confirmEmailToken } = req.params;

@@ -27,6 +27,7 @@ const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
 const DeleteUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteUsersWithNonConfirmedEmailUsecase');
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
+const ShareBankAccountDataUsecase = require('./usecases/user/shareBankAccountDataUsecase');
 const UserScheduler = require('./scheduler/userScheduler');
 const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
@@ -117,12 +118,14 @@ module.exports = class AppLauncher {
             mailProvider
         );
         const listUsersUsecase = new ListUsersUsecase(userRepository, cryptoProvider);
+        const shareBankAccountDataUsecase = new ShareBankAccountDataUsecase(userRepository);
         const userController = new UserController(
             activateUserUsecase,
             authenticateUserUsecase,
             confirmEmailUsecase,
             createUserUsecase,
-            listUsersUsecase
+            listUsersUsecase,
+            shareBankAccountDataUsecase
         );
         this.expressServer.use('/api/v1/user', userController.router());
 

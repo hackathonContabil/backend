@@ -43,6 +43,14 @@ module.exports = class {
         return user;
     }
 
+    async shareBankAccountData(id) {
+        const user = await User.update(
+            { isSharingBankAccountData: true, acceptedShareBankAccountDataAt: new Date() },
+            { where: { id } }
+        );
+        return user;
+    }
+
     async deleteUsersWithNonConfirmedEmail(expiresDate) {
         await User.destroy({
             where: {

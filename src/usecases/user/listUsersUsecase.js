@@ -17,9 +17,10 @@ module.exports = class {
     }
 
     decryptData(users) {
-        return users.map(({ email, document, ...data }) => {
+        return users.map(({ phone, email, document, ...data }) => {
             return {
                 ...data,
+                phone: this.cryptoProvider.decrypt(phone),
                 email: this.cryptoProvider.decrypt(email),
                 document: document ? this.cryptoProvider.decrypt(document) : null,
             };
