@@ -25,9 +25,9 @@ const AccountingOfficeController = require('./api/accountingOfficeController');
 const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
-const DeleteUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteUsersWithNonConfirmedEmailUsecase');
+const DeleteExpiredUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteExpiredUsersWithNonConfirmedEmailUsecase');
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
-const ShareBankAccountDataUsecase = require('./usecases/user/shareBankAccountDataUsecase');
+const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
 const UserScheduler = require('./scheduler/userScheduler');
 const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
@@ -118,21 +118,22 @@ module.exports = class AppLauncher {
             mailProvider
         );
         const listUsersUsecase = new ListUsersUsecase(userRepository, cryptoProvider);
-        const shareBankAccountDataUsecase = new ShareBankAccountDataUsecase(userRepository);
+        const allowToShareBankAccountDataUsecase = new AllowToShareBankAccountDataUsecase(
+            userRepository
+        );
         const userController = new UserController(
             activateUserUsecase,
             authenticateUserUsecase,
             confirmEmailUsecase,
             createUserUsecase,
             listUsersUsecase,
-            shareBankAccountDataUsecase
+            allowToShareBankAccountDataUsecase
         );
         this.expressServer.use('/api/v1/user', userController.router());
 
-        const deleteUsersWithNonConfirmedEmailUsecase = new DeleteUsersWithNonConfirmedEmailUsecase(
-            userRepository
-        );
-        const userScheduler = new UserScheduler(deleteUsersWithNonConfirmedEmailUsecase);
+        const deleteExpiredUsersWithNonConfirmedEmailUsecase =
+            new DeleteExpiredUsersWithNonConfirmedEmailUsecase(userRepository);
+        const userScheduler = new UserScheduler(deleteExpiredUsersWithNonConfirmedEmailUsecase);
         userScheduler.init();
 
         //  Bank account modules

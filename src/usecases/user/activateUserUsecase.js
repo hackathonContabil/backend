@@ -7,7 +7,7 @@ module.exports = class {
 
     async execute(id) {
         const user = await this.userRepository.findById(id);
-        if (!user || user.isActive || !user.isEmailConfirmed) {
+        if (!user || !user.isEmailConfirmed || user.isActive) {
             throw new BadRequestError('invalid-credentials');
         }
         await this.userRepository.activate(user.id);

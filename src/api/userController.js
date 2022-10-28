@@ -18,14 +18,14 @@ module.exports = class {
         confirmEmailUsecase,
         createUserUsecase,
         listUsersUsecase,
-        shareBankAccountDataUsecase
+        allowToShareBankAccountDataUsecase
     ) {
         this.activateUserUsecase = activateUserUsecase;
         this.authenticateUserUsecase = authenticateUserUsecase;
         this.confirmEmailUsecase = confirmEmailUsecase;
         this.createUserUsecase = createUserUsecase;
         this.listUsersUsecase = listUsersUsecase;
-        this.shareBankAccountDataUsecase = shareBankAccountDataUsecase;
+        this.allowToShareBankAccountDataUsecase = allowToShareBankAccountDataUsecase;
     }
 
     router() {
@@ -51,6 +51,25 @@ module.exports = class {
                 password,
             });
             return res.json({ status: 'success', data: { ...authenticationData } });
+        });
+
+        router.post('/activate/:id', ensureAuthentication, ensureUserIsAdmin, async (req, res) => {
+            const { id } = req.params;
+
+            await this.activateUserUsecase.execute(id);
+            return res.json({ status: 'success' });
+        });
+
+        router.get('/confirm-email/:token', async (req, res) => {
+            const { token: confirmEmailToken } = req.params;
+
+            let success = true;
+            try {
+                await this.confirmEmailUsecase.execute(confirmEmailToken);
+            } catch {
+                success = false;
+            }
+            return res.render('confirm-email', { success });
         });
 
         router.post('/accountant', createAccountantUserValidation, async (req, res) => {
@@ -97,29 +116,10 @@ module.exports = class {
             ensureAuthentication,
             ensureUserIsClient,
             async (req, res) => {
-                await this.shareBankAccountDataUsecase.execute(req.user.id);
+                await this.allowToShareBankAccountDataUsecase.execute(req.user.id);
                 return res.json({ status: 'success' });
             }
         );
-
-        router.get('/confirm-email/:token', async (req, res) => {
-            const { token: confirmEmailToken } = req.params;
-
-            let success = true;
-            try {
-                await this.confirmEmailUsecase.execute(confirmEmailToken);
-            } catch {
-                success = false;
-            }
-            return res.render('confirm-email', { success });
-        });
-
-        router.post('/activate/:id', ensureAuthentication, ensureUserIsAdmin, async (req, res) => {
-            const { id } = req.params;
-
-            await this.activateUserUsecase.execute(id);
-            return res.json({ status: 'success' });
-        });
         return router;
     }
 };

@@ -8,6 +8,7 @@ module.exports = class {
 
     async execute({ name, document }) {
         const encryptedDocument = this.cryptoProvider.encrypt(document);
+
         const [officeWithSameName, officeWithSameDocument] = await Promise.all([
             this.accountingOfficeRepository.findByName(name),
             this.accountingOfficeRepository.findByDocument(encryptedDocument),
@@ -15,10 +16,7 @@ module.exports = class {
         if (officeWithSameName || officeWithSameDocument) {
             throw new BadRequestError('invalid-credentials');
         }
-        const office = await this.accountingOfficeRepository.save({
-            name,
-            encryptedDocument,
-        });
+        const office = await this.accountingOfficeRepository.save({ name, encryptedDocument });
         return office;
     }
 };

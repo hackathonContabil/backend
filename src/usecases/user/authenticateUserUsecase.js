@@ -13,18 +13,16 @@ module.exports = class {
         if (!user || !user.isActive) {
             throw new BadRequestError('invalid-credentials');
         }
-
         const isPasswordValid = this.cryptoProvider.compareHash(password, user.password);
         if (!isPasswordValid) {
             throw new BadRequestError('invalid-credentials');
         }
-
-        const common = {
+        const commonData = {
             isAdmin: user.isAdmin,
             isAccountant: user.isAccountant,
             isSharingBankAccountData: user.isSharingBankAccountData,
         };
-        const token = this.tokenProvider.create({ id: user.id, email, ...common });
-        return { token, ...common };
+        const token = this.tokenProvider.create({ id: user.id, ...commonData });
+        return { token, ...commonData };
     }
 };

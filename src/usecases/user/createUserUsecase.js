@@ -27,28 +27,26 @@ module.exports = class {
         accountantState,
         accountingOfficeId,
     }) {
-        const passwordHash = this.cryptoProvider.hash(password);
         const encryptedEmail = this.cryptoProvider.encrypt(email);
         const encryptedPhone = phone ? this.cryptoProvider.encrypt(phone) : null;
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
 
-        const [userWithSameEmail, userWithSamePhone, userWithSameDocument, accountingOffice] =
+        const [isEmailInvalid, isPhoneInvalid, isDocumentInvalid, isAccountingOfficeValid] =
             await Promise.all([
-                this.userRepository.findByEmail(encryptedEmail),
                 this.findUserByPhoneIfItExists(encryptedPhone),
+                this.userRepository.findByEmail(encryptedEmail),
                 this.findUserByDocumentIfItExists(encryptedDocument),
                 this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
             ]);
-        if (userWithSameEmail || userWithSamePhone || userWithSameDocument || !accountingOffice) {
+        if (isPhoneInvalid || isEmailInvalid || isDocumentInvalid || !isAccountingOfficeValid) {
             throw new BadRequestError('invalid-credentials');
         }
-
         const user = await this.userRepository.save({
             name,
             phone: encryptedPhone,
             email: encryptedEmail,
-            password: passwordHash,
-            document: document ? encryptedDocument : null,
+            document: encryptedDocument,
+            password: this.cryptoProvider.hash(password),
             isAdmin,
             isClient,
             isAccountant,

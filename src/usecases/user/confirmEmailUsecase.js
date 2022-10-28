@@ -8,12 +8,11 @@ module.exports = class {
     }
 
     async execute(token) {
-        const tokenData = this.tokenProvider.getDataIfIsValid(token);
-        if (!tokenData) {
+        const data = this.tokenProvider.getDataIfIsValid(token);
+        if (!data) {
             throw new BadRequestError('invalid-token');
         }
-
-        const email = this.cryptoProvider.encrypt(tokenData.email);
+        const email = this.cryptoProvider.encrypt(data.email);
         const user = await this.userRepository.findByEmail(email);
         if (!user || user.isEmailConfirmed) {
             throw new BadRequestError('invalid-token');
