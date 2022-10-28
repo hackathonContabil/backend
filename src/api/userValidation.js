@@ -15,20 +15,14 @@ const authenticateUserValidation = validate({
     },
 });
 
-const createAdminUserValidation = validate({
-    body: {
-        name: joi.string().required().label('Nome').min(8).max(128),
-        email: joi.string().email().label('E-mail').max(128),
-        password: joi.string().required().label('Senha').min(8).max(128),
-    },
-});
-
 const createClientUserValidation = validate({
     body: {
         name: joi.string().required().label('Nome').min(8).max(128),
+        phone: joi.string().required().label('Telefone').min(8).max(14),
         email: joi.string().email().label('E-mail').max(128),
         password: joi.string().required().label('Senha').min(8).max(128),
         document: joi.string().required().label('CNPJ').length(14),
+        accountingOfficeId: joi.number().required().label('Escritório').min(1),
     },
 });
 
@@ -45,7 +39,6 @@ const createAccountantUserValidation = validate({
 module.exports = {
     listUsersValidation,
     authenticateUserValidation,
-    createAdminUserValidation,
     createClientUserValidation,
     createAccountantUserValidation,
 };

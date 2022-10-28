@@ -15,9 +15,9 @@ module.exports = class {
 
         const email = this.cryptoProvider.encrypt(tokenData.email);
         const user = await this.userRepository.findByEmail(email);
-        if (!user || user.isActive) {
+        if (!user || user.isEmailConfirmed) {
             throw new BadRequestError('invalid-token');
         }
-        await this.userRepository.active(user.id);
+        await this.userRepository.confirmEmail(user.id);
     }
 };

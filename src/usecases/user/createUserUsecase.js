@@ -17,16 +17,19 @@ module.exports = class {
 
     async execute({
         name,
+        phone,
         email,
         password,
         document,
         isAdmin,
+        isClient,
         isAccountant,
         accountantState,
         accountingOfficeId,
     }) {
         const passwordHash = this.cryptoProvider.hash(password);
         const encryptedEmail = this.cryptoProvider.encrypt(email);
+        const encryptedPhone = phone ? this.cryptoProvider.encrypt(phone) : null;
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
 
         const [userWithSameEmail, userWithSameDocument, accountingOffice] = await Promise.all([
@@ -40,10 +43,12 @@ module.exports = class {
 
         const user = await this.userRepository.save({
             name,
+            phone: encryptedPhone,
             email: encryptedEmail,
             password: passwordHash,
             document: document ? encryptedDocument : null,
             isAdmin,
+            isClient,
             isAccountant,
             accountantState,
             accountingOfficeId,

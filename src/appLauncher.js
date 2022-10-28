@@ -20,11 +20,11 @@ const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/creat
 const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
 const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const BankAccountController = require('./api/bankAccountController');
-const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
+const ConfirmEmailUsecase = require('./usecases/user/confirmEmailUsecase');
 const AccountingOfficeController = require('./api/accountingOfficeController');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
-const DeleteExpiredNonActiveUsersUsecase = require('./usecases/user/deleteExpiredNonActiveUsersUsecase');
+const DeleteUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteUsersWithNonConfirmedEmailUsecase');
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
 const UserScheduler = require('./scheduler/userScheduler');
 const FileController = require('./api/fileController');
@@ -97,12 +97,12 @@ module.exports = class AppLauncher {
 
         AccountingOfficeController;
         // User modules
-        const activateUserUsecase = new ActivateUserUsecase(
+        const authenticateUserUsecase = new AuthenticateUserUsecase(
             userRepository,
             cryptoProvider,
             tokenProvider
         );
-        const authenticateUserUsecase = new AuthenticateUserUsecase(
+        const confirmEmailUsecase = new ConfirmEmailUsecase(
             userRepository,
             cryptoProvider,
             tokenProvider
@@ -116,17 +116,17 @@ module.exports = class AppLauncher {
         );
         const listUsersUsecase = new ListUsersUsecase(userRepository, cryptoProvider);
         const userController = new UserController(
-            activateUserUsecase,
             authenticateUserUsecase,
+            confirmEmailUsecase,
             createUserUsecase,
             listUsersUsecase
         );
         this.expressServer.use('/api/v1/user', userController.router());
 
-        const deleteExpiredNonActiveUsersUsecase = new DeleteExpiredNonActiveUsersUsecase(
+        const deleteUsersWithNonConfirmedEmailUsecase = new DeleteUsersWithNonConfirmedEmailUsecase(
             userRepository
         );
-        const userScheduler = new UserScheduler(deleteExpiredNonActiveUsersUsecase);
+        const userScheduler = new UserScheduler(deleteUsersWithNonConfirmedEmailUsecase);
         userScheduler.init();
 
         //  Bank account modules

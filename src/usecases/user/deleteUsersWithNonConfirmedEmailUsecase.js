@@ -10,6 +10,6 @@ module.exports = class {
         const validationTokenExpiresDate = now.setHours(
             now.getHours() - this.tokenExpiresTimeInHours
         );
-        await this.userRepository.deleteExpiredNonActiveUsers(validationTokenExpiresDate);
+        await this.userRepository.deleteUsersWithNonConfirmedEmail(validationTokenExpiresDate);
     }
 };

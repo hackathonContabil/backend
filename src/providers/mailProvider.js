@@ -33,11 +33,11 @@ module.exports = class {
 
     sendActivateAccountMail(token, userEmail) {
         const mailData = {
-            link: `${this.apiRootUrl}/user/activate/${token}`,
+            link: `${this.apiRootUrl}/user/confirm-email/${token}`,
         };
 
-        const mailTemplate = 'activate-account';
-        const mailSubject = 'E-mail para ativação de contas';
+        const mailTemplate = 'confirm-email';
+        const mailSubject = 'Confirmação de e-mail';
         this.send(mailTemplate, mailData, mailSubject, userEmail);
     }
 };

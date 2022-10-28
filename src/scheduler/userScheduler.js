@@ -1,13 +1,13 @@
 const schedule = require('node-schedule');
 
 module.exports = class {
-    constructor(deleteExpiredNonActiveUsersUsecase) {
-        this.deleteExpiredNonActiveUsersUsecase = deleteExpiredNonActiveUsersUsecase;
+    constructor(deleteUsersWithNonConfirmedEmailUsecase) {
+        this.deleteUsersWithNonConfirmedEmailUsecase = deleteUsersWithNonConfirmedEmailUsecase;
     }
 
     init() {
-        schedule.scheduleJob('* 5 * * * *', () => {
-            this.deleteExpiredNonActiveUsersUsecase.execute();
+        schedule.scheduleJob('* 1 * * * *', () => {
+            this.deleteUsersWithNonConfirmedEmailUsecase.execute();
         });
     }
 };

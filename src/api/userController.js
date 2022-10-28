@@ -3,18 +3,16 @@ const { normalizeEmail } = require('../helper');
 const {
     listUsersValidation,
     authenticateUserValidation,
-    createAdminUserValidation,
     createClientUserValidation,
     createAccountantUserValidation,
 } = require('./userValidation');
-const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 
 module.exports = class {
-    constructor(activateUserUsecase, authenticateUserUsecase, createUserUsecase, listUsersUsecase) {
-        this.activateUserUsecase = activateUserUsecase;
+    constructor(authenticateUserUsecase, confirmEmailUsecase, createUserUsecase, listUsersUsecase) {
         this.authenticateUserUsecase = authenticateUserUsecase;
+        this.confirmEmailUsecase = confirmEmailUsecase;
         this.createUserUsecase = createUserUsecase;
         this.listUsersUsecase = listUsersUsecase;
     }
@@ -44,79 +42,50 @@ module.exports = class {
             return res.json({ status: 'success', data: { ...authenticationData } });
         });
 
-        router.post(
-            '/admin',
-            ensureAuthentication,
-            ensureUserIsAdmin,
-            createAdminUserValidation,
-            async (req, res) => {
-                const { name, email, password } = req.body;
+        router.post('/accountant', createAccountantUserValidation, async (req, res) => {
+            const { name, email, password, accountantState, accountingOfficeId } = req.body;
 
-                const user = await this.createUserUsecase.execute({
-                    name,
-                    email,
-                    password,
-                    isAdmin: true,
-                });
-                delete user.email;
-                delete user.password;
-                return res.json({ status: 'success', data: { user } });
-            }
-        );
+            const user = await this.createUserUsecase.execute({
+                name,
+                email: normalizeEmail(email),
+                password,
+                accountantState,
+                accountingOfficeId,
+                isAccountant: true,
+            });
+            delete user.email;
+            delete user.password;
+            return res.json({ status: 'success', data: { user } });
+        });
 
-        router.post(
-            '/accountant',
-            ensureAuthentication,
-            ensureUserIsAdmin,
-            createAccountantUserValidation,
-            async (req, res) => {
-                const { name, email, password, accountantState, accountingOfficeId } = req.body;
+        router.post('/client', createClientUserValidation, async (req, res) => {
+            const { name, email, phone, password, document, accountingOfficeId } = req.body;
 
-                const user = await this.createUserUsecase.execute({
-                    name,
-                    email: normalizeEmail(email),
-                    password,
-                    accountantState,
-                    accountingOfficeId,
-                    isAccountant: true,
-                });
-                delete user.email;
-                delete user.password;
-                return res.json({ status: 'success', data: { user } });
-            }
-        );
+            const user = await this.createUserUsecase.execute({
+                name,
+                phone,
+                email: normalizeEmail(email),
+                password,
+                document,
+                isClient: true,
+                accountingOfficeId,
+            });
+            delete user.email;
+            delete user.password;
+            delete user.document;
+            return res.json({ status: 'success', data: { user } });
+        });
 
-        router.post(
-            '/client',
-            ensureAuthentication,
-            ensureUserIsAccountant,
-            createClientUserValidation,
-            async (req, res) => {
-                const { name, email, password, document } = req.body;
-
-                const user = await this.createUserUsecase.execute({
-                    name,
-                    email: normalizeEmail(email),
-                    password,
-                    document,
-                });
-                delete user.email;
-                delete user.password;
-                delete user.document;
-                return res.json({ status: 'success', data: { user } });
-            }
-        );
-
-        router.get('/activate/:token', async (req, res) => {
-            const { token: activateAccountToken } = req.params;
+        router.get('/confirm-email/:token', async (req, res) => {
+            const { token: confirmEmailToken } = req.params;
 
             let success = true;
             try {
-                await this.activateUserUsecase.execute(activateAccountToken);
+                await this.confirmEmailUsecase.execute(confirmEmailToken);
             } catch {
                 success = false;
             }
-            return res.render('activate-account', { success });
+            return res.render('confirm-email', { success });
         });
         return router;
     }

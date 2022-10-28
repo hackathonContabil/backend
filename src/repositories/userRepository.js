@@ -30,10 +30,18 @@ module.exports = class {
         return user;
     }
 
-    async deleteExpiredNonActiveUsers(expiresDate) {
+    async confirmEmail(id) {
+        const user = await User.update(
+            { isEmailConfirmed: true, emailConfirmedAt: new Date() },
+            { where: { id } }
+        );
+        return user;
+    }
+
+    async deleteUsersWithNonConfirmedEmail(expiresDate) {
         await User.destroy({
             where: {
-                isActive: false,
+                isEmailConfirmed: false,
                 createdAt: { [Op.lt]: expiresDate },
             },
         });

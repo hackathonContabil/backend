@@ -14,10 +14,24 @@ module.exports = class User extends Model {
                     type: DataTypes.STRING(128),
                     allowNull: false,
                 },
+                phone: {
+                    type: DataTypes.STRING(32),
+                    unique: true,
+                    allowNull: true,
+                },
                 email: {
                     type: DataTypes.STRING(192),
                     unique: true,
                     allowNull: false,
+                },
+                isEmailConfirmed: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
+                    allowNull: false,
+                },
+                emailConfirmedAt: {
+                    type: DataTypes.DATE,
+                    allowNull: true,
                 },
                 password: {
                     type: DataTypes.STRING(64),
@@ -28,11 +42,6 @@ module.exports = class User extends Model {
                     unique: true,
                     allowNull: true,
                 },
-                isAdmin: {
-                    type: DataTypes.BOOLEAN,
-                    defaultValue: false,
-                    allowNull: false,
-                },
                 isActive: {
                     type: DataTypes.BOOLEAN,
                     defaultValue: false,
@@ -41,6 +50,16 @@ module.exports = class User extends Model {
                 activatedAt: {
                     type: DataTypes.DATE,
                     allowNull: true,
+                },
+                isAdmin: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
+                    allowNull: false,
+                },
+                isClient: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
+                    allowNull: false,
                 },
                 isAccountant: {
                     type: DataTypes.BOOLEAN,
