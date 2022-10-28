@@ -53,13 +53,6 @@ module.exports = class {
             return res.json({ status: 'success', data: { ...authenticationData } });
         });
 
-        router.post('/activate/:id', ensureAuthentication, ensureUserIsAdmin, async (req, res) => {
-            const { id } = req.params;
-
-            await this.activateUserUsecase.execute(id);
-            return res.status(204).send();
-        });
-
         router.get('/confirm-email/:token', async (req, res) => {
             const { token: confirmEmailToken } = req.params;
 
@@ -91,6 +84,18 @@ module.exports = class {
             return res.status(201).json({ status: 'success', data: { user } });
         });
 
+        router.post(
+            '/accountant/activate/:id',
+            ensureAuthentication,
+            ensureUserIsAdmin,
+            async (req, res) => {
+                const { id } = req.params;
+
+                await this.activateUserUsecase.execute({ id, isAccountant: true });
+                return res.status(204).send();
+            }
+        );
+
         router.post('/client', createClientUserValidation, async (req, res) => {
             const { name, email, phone, password, document, accountingOfficeId } = req.body;
 
@@ -110,6 +115,18 @@ module.exports = class {
             delete user.accountantState;
             return res.status(201).json({ status: 'success', data: { user } });
         });
+
+        router.post(
+            '/client/activate/:id',
+            ensureAuthentication,
+            ensureUserIsAccountant,
+            async (req, res) => {
+                const { id } = req.params;
+
+                await this.activateUserUsecase.execute({ id, isClient: true });
+                return res.status(204).send();
+            }
+        );
 
         router.post(
             '/client/share-bank-account-data',

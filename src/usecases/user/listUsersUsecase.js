@@ -20,7 +20,7 @@ module.exports = class {
         return users.map(({ phone, email, document, ...data }) => {
             return {
                 ...data,
-                phone: this.cryptoProvider.decrypt(phone),
+                phone: phone ? this.cryptoProvider.decrypt(phone) : null,
                 email: this.cryptoProvider.decrypt(email),
                 document: document ? this.cryptoProvider.decrypt(document) : null,
             };

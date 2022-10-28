@@ -19,6 +19,7 @@ module.exports = class {
         }
         const commonData = {
             isAdmin: user.isAdmin,
+            isClient: user.isClient,
             isAccountant: user.isAccountant,
             isSharingBankAccountData: user.isSharingBankAccountData,
         };

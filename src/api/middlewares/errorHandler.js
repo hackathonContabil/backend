@@ -8,9 +8,7 @@ module.exports = (error, _req, res, _next) => {
             .status(error.status)
             .json({ status: 'error', messages: [messages[error.message].message] });
     }
-
     console.log(error);
-
     return res
         .status(messages.internal.status)
         .json({ status: 'error', messages: [messages.internal.message] });
