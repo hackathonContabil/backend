@@ -22,6 +22,7 @@ const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount
 const BankAccountController = require('./api/bankAccountController');
 const ConfirmEmailUsecase = require('./usecases/user/confirmEmailUsecase');
 const AccountingOfficeController = require('./api/accountingOfficeController');
+const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
 const DeleteUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteUsersWithNonConfirmedEmailUsecase');
@@ -88,15 +89,16 @@ module.exports = class AppLauncher {
 
         // Accounting Office modules
         const createAccountingOfficeUsecase = new CreateAccountingOfficeUsecase(
-            accountingOfficeRepository
+            accountingOfficeRepository,
+            cryptoProvider
         );
         const accountingOfficeController = new AccountingOfficeController(
             createAccountingOfficeUsecase
         );
         this.expressServer.use('/api/v1/accounting-office', accountingOfficeController.router());
 
-        AccountingOfficeController;
         // User modules
+        const activateUserUsecase = new ActivateUserUsecase(userRepository);
         const authenticateUserUsecase = new AuthenticateUserUsecase(
             userRepository,
             cryptoProvider,
@@ -116,6 +118,7 @@ module.exports = class AppLauncher {
         );
         const listUsersUsecase = new ListUsersUsecase(userRepository, cryptoProvider);
         const userController = new UserController(
+            activateUserUsecase,
             authenticateUserUsecase,
             confirmEmailUsecase,
             createUserUsecase,

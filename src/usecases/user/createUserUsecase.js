@@ -32,12 +32,14 @@ module.exports = class {
         const encryptedPhone = phone ? this.cryptoProvider.encrypt(phone) : null;
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
 
-        const [userWithSameEmail, userWithSameDocument, accountingOffice] = await Promise.all([
-            this.userRepository.findByEmail(encryptedEmail),
-            this.findUserByDocumentIfItExists(encryptedDocument),
-            this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
-        ]);
-        if (userWithSameEmail || userWithSameDocument || !accountingOffice) {
+        const [userWithSameEmail, userWithSamePhone, userWithSameDocument, accountingOffice] =
+            await Promise.all([
+                this.userRepository.findByEmail(encryptedEmail),
+                this.findUserByPhoneIfItExists(encryptedPhone),
+                this.findUserByDocumentIfItExists(encryptedDocument),
+                this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
+            ]);
+        if (userWithSameEmail || userWithSamePhone || userWithSameDocument || !accountingOffice) {
             throw new BadRequestError('invalid-credentials');
         }
 
@@ -54,6 +56,14 @@ module.exports = class {
             accountingOfficeId,
         });
         this.sendValidationMail(email);
+        return user;
+    }
+
+    async findUserByPhoneIfItExists(phone) {
+        if (!phone) {
+            return;
+        }
+        const user = await this.userRepository.findByPhone(phone);
         return user;
     }
 

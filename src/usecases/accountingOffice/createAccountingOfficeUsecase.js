@@ -1,18 +1,23 @@
 const BadRequestError = require('../../errors/badRequestError');
 
 module.exports = class {
-    constructor(accountingOfficeRepository) {
+    constructor(accountingOfficeRepository, cryptoProvider) {
         this.accountingOfficeRepository = accountingOfficeRepository;
+        this.cryptoProvider = cryptoProvider;
     }
 
     async execute({ name, document }) {
-        const officeWithSameName = await this.accountingOfficeRepository.findByName(name);
-        if (officeWithSameName) {
+        const encryptedDocument = this.cryptoProvider.encrypt(document);
+        const [officeWithSameName, officeWithSameDocument] = await Promise.all([
+            this.accountingOfficeRepository.findByName(name),
+            this.accountingOfficeRepository.findByDocument(encryptedDocument),
+        ]);
+        if (officeWithSameName || officeWithSameDocument) {
             throw new BadRequestError('invalid-credentials');
         }
         const office = await this.accountingOfficeRepository.save({
             name,
-            document,
+            encryptedDocument,
         });
         return office;
     }

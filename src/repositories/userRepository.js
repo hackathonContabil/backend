@@ -8,21 +8,26 @@ module.exports = class {
     }
 
     async findById(id) {
-        const user = await User.findOne({ where: { id } }, { raw: true });
+        const user = await User.findOne({ where: { id }, raw: true });
+        return user;
+    }
+
+    async findByPhone(phone) {
+        const user = await User.findOne({ where: { phone }, raw: true });
         return user;
     }
 
     async findByEmail(email) {
-        const user = await User.findOne({ where: { email } }, { raw: true });
+        const user = await User.findOne({ where: { email }, raw: true });
         return user;
     }
 
     async findByDocument(document) {
-        const user = await User.findOne({ where: { document } }, { raw: true });
+        const user = await User.findOne({ where: { document }, raw: true });
         return user;
     }
 
-    async active(id) {
+    async activate(id) {
         const user = await User.update(
             { isActive: true, activatedAt: new Date() },
             { where: { id } }

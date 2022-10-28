@@ -7,10 +7,18 @@ const {
     createAccountantUserValidation,
 } = require('./userValidation');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
+const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 
 module.exports = class {
-    constructor(authenticateUserUsecase, confirmEmailUsecase, createUserUsecase, listUsersUsecase) {
+    constructor(
+        activateUserUsecase,
+        authenticateUserUsecase,
+        confirmEmailUsecase,
+        createUserUsecase,
+        listUsersUsecase
+    ) {
+        this.activateUserUsecase = activateUserUsecase;
         this.authenticateUserUsecase = authenticateUserUsecase;
         this.confirmEmailUsecase = confirmEmailUsecase;
         this.createUserUsecase = createUserUsecase;
@@ -53,8 +61,11 @@ module.exports = class {
                 accountingOfficeId,
                 isAccountant: true,
             });
+            delete user.phone;
             delete user.email;
             delete user.password;
+            delete user.document;
+            delete user.isSharingBankAccountData;
             return res.json({ status: 'success', data: { user } });
         });
 
@@ -70,9 +81,11 @@ module.exports = class {
                 isClient: true,
                 accountingOfficeId,
             });
+            delete user.phone;
             delete user.email;
             delete user.password;
             delete user.document;
+            delete user.accountantState;
             return res.json({ status: 'success', data: { user } });
         });
 
@@ -86,6 +99,13 @@ module.exports = class {
                 success = false;
             }
             return res.render('confirm-email', { success });
+        });
+
+        router.post('/activate/:id', ensureAuthentication, ensureUserIsAdmin, async (req, res) => {
+            const { id } = req.params;
+
+            await this.activateUserUsecase.execute(id);
+            return res.json({ status: 'success' });
         });
         return router;
     }

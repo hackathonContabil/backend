@@ -15,4 +15,9 @@ module.exports = class {
         const office = await AccountingOffice.findOne({ where: { name } }, { raw: true });
         return office;
     }
+
+    async findByDocument(document) {
+        const office = await AccountingOffice.findOne({ where: { document } }, { raw: true });
+        return office;
+    }
 };
