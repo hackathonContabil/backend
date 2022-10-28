@@ -4,7 +4,7 @@ const pluggyBankData = {
     SANDBOX: { id: 8, name: 'Pluggy Bank BR Business', color: '#ef294b' },
 };
 
-module.exports = class BankAccountDataProvider {
+module.exports = class {
     clientId = process.env.PLUGGY_CLIENT_ID;
     clientSecret = process.env.PLUGGY_SECRET;
 

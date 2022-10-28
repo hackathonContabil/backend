@@ -3,7 +3,7 @@ const { createAccountingOfficeValidation } = require('./accountingOfficeValidati
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 
-module.exports = class AccountingOfficeController {
+module.exports = class {
     constructor(createAccountingOfficeUsecase) {
         this.createAccountingOfficeUsecase = createAccountingOfficeUsecase;
     }

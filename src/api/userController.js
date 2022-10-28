@@ -11,14 +11,9 @@ const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 
-module.exports = class UserController {
-    constructor(
-        activateUserAccountUsecase,
-        authenticateUserUsecase,
-        createUserUsecase,
-        listUsersUsecase
-    ) {
-        this.activateUserAccountUsecase = activateUserAccountUsecase;
+module.exports = class {
+    constructor(activateUserUsecase, authenticateUserUsecase, createUserUsecase, listUsersUsecase) {
+        this.activateUserUsecase = activateUserUsecase;
         this.authenticateUserUsecase = authenticateUserUsecase;
         this.createUserUsecase = createUserUsecase;
         this.listUsersUsecase = listUsersUsecase;
@@ -117,7 +112,7 @@ module.exports = class UserController {
 
             let success = true;
             try {
-                await this.activateUserAccountUsecase.execute(activateAccountToken);
+                await this.activateUserUsecase.execute(activateAccountToken);
             } catch {
                 success = false;
             }

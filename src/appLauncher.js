@@ -5,32 +5,27 @@ const compression = require('compression');
 const { engine } = require('express-handlebars');
 const { Sequelize } = require('sequelize');
 const errorHandler = require('./api/middlewares/errorHandler');
-
 const AccountingOffice = require('./models/accountingOffice');
 const BankAccountConnector = require('./models/bankAccountConnector');
 const User = require('./models/user');
-
 const BankAccountDataProvider = require('./providers/bankAccountDataProvider');
 const CryptoProvider = require('./providers/cryptoProvider');
 const MailProvider = require('./providers/mailProvider');
 const SpreadsheetProvider = require('./providers/spreadsheetProvider');
 const TokenProvider = require('./providers/tokenProvider');
-
 const AccountingOfficeRepository = require('./repositories/accountingOfficeRepository');
 const BankAccountConnectorRepository = require('./repositories/bankAccountConnectorRepository');
 const UserRepository = require('./repositories/userRepository');
-
-const CreateAccountingOfficeUsecase = require('./usecases/accountOffice/createAccountingOfficeUsecase');
+const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/createAccountingOfficeUsecase');
 const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
-const ExportTransactionsDataSpreadsheet = require('./usecases/bankAccount/exportTransactionsDataSpreadsheet');
+const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const BankAccountController = require('./api/bankAccountController');
-const ActivateUserAccountUsecase = require('./usecases/user/activateUserAccountUsecase');
+const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
 const AccountingOfficeController = require('./api/accountingOfficeController');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
 const CreateUserUsecase = require('./usecases/user/createUserUsecase');
-const DeleteExpiredNonActiveUsers = require('./usecases/user/deleteExpiredNonActiveUsers');
+const DeleteExpiredNonActiveUsersUsecase = require('./usecases/user/deleteExpiredNonActiveUsersUsecase');
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
-
 const UserScheduler = require('./scheduler/userScheduler');
 const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
@@ -87,7 +82,6 @@ module.exports = class AppLauncher {
         const mailProvider = new MailProvider();
         const spreadsheetProvider = new SpreadsheetProvider();
         const tokenProvider = new TokenProvider();
-
         const accountingOfficeRepository = new AccountingOfficeRepository();
         const bankAccountConnectorRepository = new BankAccountConnectorRepository();
         const userRepository = new UserRepository();
@@ -103,7 +97,7 @@ module.exports = class AppLauncher {
 
         AccountingOfficeController;
         // User modules
-        const activateUserAccountUsecase = new ActivateUserAccountUsecase(
+        const activateUserUsecase = new ActivateUserUsecase(
             userRepository,
             cryptoProvider,
             tokenProvider
@@ -114,24 +108,26 @@ module.exports = class AppLauncher {
             tokenProvider
         );
         const createUserUsecase = new CreateUserUsecase(
+            accountingOfficeRepository,
             userRepository,
             cryptoProvider,
             tokenProvider,
             mailProvider
         );
-        const deleteExpiredNonActiveUsers = new DeleteExpiredNonActiveUsers(userRepository);
         const listUsersUsecase = new ListUsersUsecase(userRepository, cryptoProvider);
-
-        const userScheduler = new UserScheduler(deleteExpiredNonActiveUsers);
-        userScheduler.init();
-
         const userController = new UserController(
-            activateUserAccountUsecase,
+            activateUserUsecase,
             authenticateUserUsecase,
             createUserUsecase,
             listUsersUsecase
         );
         this.expressServer.use('/api/v1/user', userController.router());
+
+        const deleteExpiredNonActiveUsersUsecase = new DeleteExpiredNonActiveUsersUsecase(
+            userRepository
+        );
+        const userScheduler = new UserScheduler(deleteExpiredNonActiveUsersUsecase);
+        userScheduler.init();
 
         //  Bank account modules
         const connectBankAccountUsecase = new ConnectBankAccountUsecase(
@@ -143,11 +139,9 @@ module.exports = class AppLauncher {
         this.expressServer.use('/api/v1/bank-account', bankAccountController.router());
 
         // File modules
-        const exportTransactionsDataSpreadsheet = new ExportTransactionsDataSpreadsheet(
-            tokenProvider,
-            spreadsheetProvider
-        );
-        const fileController = new FileController(exportTransactionsDataSpreadsheet);
+        const exportTransactionsDataSpreadsheetUsecase =
+            new ExportTransactionsDataSpreadsheetUsecase(tokenProvider, spreadsheetProvider);
+        const fileController = new FileController(exportTransactionsDataSpreadsheetUsecase);
         this.expressServer.use('/api/v1/file', fileController.router());
     }
 };

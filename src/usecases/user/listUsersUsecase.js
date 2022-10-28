@@ -1,4 +1,4 @@
-module.exports = class ListUsersUsecase {
+module.exports = class {
     constructor(userRepository, cryptoProvider) {
         this.userRepository = userRepository;
         this.cryptoProvider = cryptoProvider;
@@ -12,14 +12,14 @@ module.exports = class ListUsersUsecase {
         );
         return {
             total,
-            users: !decrypt ? users : this.decryptUserData(users),
+            users: !decrypt ? users : this.decryptData(users),
         };
     }
 
-    decryptUserData(users) {
-        return users.map(({ email, document, ...userData }) => {
+    decryptData(users) {
+        return users.map(({ email, document, ...data }) => {
             return {
-                ...userData,
+                ...data,
                 email: this.cryptoProvider.decrypt(email),
                 document: document ? this.cryptoProvider.decrypt(document) : null,
             };

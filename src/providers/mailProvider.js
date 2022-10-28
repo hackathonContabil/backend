@@ -3,7 +3,7 @@ const { readFileSync } = require('fs');
 const { createTransport } = require('nodemailer');
 const { compile: compileTemplate } = require('handlebars');
 
-module.exports = class MailProvider {
+module.exports = class {
     smtpHost = process.env.SMTP_HOST;
     smtpPort = process.env.SMTP_PORT;
     smtpUser = process.env.SMTP_USER;

@@ -2,7 +2,7 @@ const { Router } = require('express');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 
-module.exports = class BankAccountController {
+module.exports = class {
     constructor(connectBankAccountUsecase) {
         this.connectBankAccountUsecase = connectBankAccountUsecase;
     }

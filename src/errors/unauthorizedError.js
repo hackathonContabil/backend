@@ -1,4 +1,4 @@
-module.exports = class UnauthorizedError {
+module.exports = class {
     status = 401;
 
     constructor(message) {

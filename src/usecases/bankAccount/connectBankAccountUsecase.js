@@ -1,4 +1,4 @@
-module.exports = class ConnectBankAccountUsecase {
+module.exports = class {
     constructor(bankAccountRepository, cryptoProvider, bankAccountDataProvider) {
         this.bankAccountRepository = bankAccountRepository;
         this.cryptoProvider = cryptoProvider;
@@ -8,17 +8,19 @@ module.exports = class ConnectBankAccountUsecase {
     async execute({ bank = 'SANDBOX', userId, credentials }) {
         switch (bank) {
             default:
-                return this.connectToSandboxBankAccount(bank, userId, credentials);
+                return this.connectToSandbox(bank, userId, credentials);
         }
     }
 
-    async connectToSandboxBankAccount(bank, userId, credentials) {
-        const accountConnectionId =
-            await this.bankAccountDataProvider.createSandboxAccountConnectionId(bank, credentials);
-        const bankAccount = await this.bankAccountRepository.save({
+    async connectToSandbox(bank, userId, credentials) {
+        const connectionId = await this.bankAccountDataProvider.createSandboxAccountConnectionId(
+            bank,
+            credentials
+        );
+        const account = await this.bankAccountRepository.save({
             userId,
-            connector: this.cryptoProvider.encrypt(accountConnectionId),
+            connector: this.cryptoProvider.encrypt(connectionId),
         });
-        return bankAccount;
+        return account;
     }
 };

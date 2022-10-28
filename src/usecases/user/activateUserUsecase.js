@@ -1,6 +1,6 @@
 const BadRequestError = require('../../errors/badRequestError');
 
-module.exports = class ActivateUserAccountUsecase {
+module.exports = class {
     constructor(userRepository, cryptoProvider, tokenProvider) {
         this.userRepository = userRepository;
         this.cryptoProvider = cryptoProvider;
@@ -8,7 +8,7 @@ module.exports = class ActivateUserAccountUsecase {
     }
 
     async execute(token) {
-        const tokenData = this.tokenProvider.getInfoIfTokenIsValid(token);
+        const tokenData = this.tokenProvider.getDataIfIsValid(token);
         if (!tokenData) {
             throw new BadRequestError('invalid-token');
         }

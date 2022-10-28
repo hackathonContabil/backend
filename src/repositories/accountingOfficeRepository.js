@@ -1,13 +1,18 @@
 const AccountingOffice = require('../models/accountingOffice');
 
-module.exports = class BankAccountConnectorRepository {
-    async save(userInfo) {
-        const user = await AccountingOffice.create(userInfo);
-        return user.get({ plain: true });
+module.exports = class {
+    async save(data) {
+        const office = await AccountingOffice.create(data);
+        return office.get({ plain: true });
+    }
+
+    async findById(id) {
+        const office = await AccountingOffice.findOne({ where: { id } }, { raw: true });
+        return office;
     }
 
     async findByName(name) {
-        const user = await AccountingOffice.findOne({ where: { name } }, { raw: true });
-        return user;
+        const office = await AccountingOffice.findOne({ where: { name } }, { raw: true });
+        return office;
     }
 };

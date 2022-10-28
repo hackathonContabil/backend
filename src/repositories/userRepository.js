@@ -1,9 +1,9 @@
 const { Op } = require('sequelize');
 const User = require('../models/user');
 
-module.exports = class UserRepository {
-    async save(userInfo) {
-        const user = await User.create(userInfo);
+module.exports = class {
+    async save(data) {
+        const user = await User.create(data);
         return user.get({ plain: true });
     }
 
@@ -30,11 +30,11 @@ module.exports = class UserRepository {
         return user;
     }
 
-    async deleteExpiredNonActiveUsers(expiredDate) {
+    async deleteExpiredNonActiveUsers(expiresDate) {
         await User.destroy({
             where: {
                 isActive: false,
-                createdAt: { [Op.lt]: expiredDate },
+                createdAt: { [Op.lt]: expiresDate },
             },
         });
     }

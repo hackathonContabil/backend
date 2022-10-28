@@ -1,14 +1,13 @@
 const BadRequestError = require('../../errors/badRequestError');
 
-module.exports = class ExportTransactionsUsecase {
+module.exports = class {
     constructor(tokenProvider, spreadsheetProvider) {
         this.tokenProvider = tokenProvider;
         this.spreadsheetProvider = spreadsheetProvider;
     }
 
     execute(transactionsOptionsToken) {
-        const transactionsOptions =
-            this.tokenProvider.getInfoIfTokenIsValid(transactionsOptionsToken);
+        const transactionsOptions = this.tokenProvider.getDataIfIsValid(transactionsOptionsToken);
         if (!transactionsOptions) {
             throw new BadRequestError('invalid-token');
         }

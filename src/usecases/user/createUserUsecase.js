@@ -1,7 +1,14 @@
 const BadRequestError = require('../../errors/badRequestError');
 
-module.exports = class CreateUserUsecase {
-    constructor(userRepository, cryptoProvider, tokenProvider, mailProvider) {
+module.exports = class {
+    constructor(
+        accountingOfficeRepository,
+        userRepository,
+        cryptoProvider,
+        tokenProvider,
+        mailProvider
+    ) {
+        this.accountingOfficeRepository = accountingOfficeRepository;
         this.userRepository = userRepository;
         this.cryptoProvider = cryptoProvider;
         this.tokenProvider = tokenProvider;
@@ -22,11 +29,12 @@ module.exports = class CreateUserUsecase {
         const encryptedEmail = this.cryptoProvider.encrypt(email);
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
 
-        const [userWithSameEmail, userWithSameDocument] = await Promise.all([
+        const [userWithSameEmail, userWithSameDocument, accountingOffice] = await Promise.all([
             this.userRepository.findByEmail(encryptedEmail),
-            this.findUserByDocumentIfItsNotNull(encryptedDocument),
+            this.findUserByDocumentIfItExists(encryptedDocument),
+            this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
         ]);
-        if (userWithSameEmail || userWithSameDocument) {
+        if (userWithSameEmail || userWithSameDocument || !accountingOffice) {
             throw new BadRequestError('invalid-credentials');
         }
 
@@ -44,12 +52,20 @@ module.exports = class CreateUserUsecase {
         return user;
     }
 
-    async findUserByDocumentIfItsNotNull(document) {
+    async findUserByDocumentIfItExists(document) {
         if (!document) {
             return;
         }
-        const userWithSameDocument = await this.userRepository.findByDocument(document);
-        return userWithSameDocument;
+        const user = await this.userRepository.findByDocument(document);
+        return user;
+    }
+
+    async findAccountingOfficeByIdIfItExists(id) {
+        if (!id) {
+            return;
+        }
+        const office = await this.accountingOfficeRepository.findById(id);
+        return office;
     }
 
     sendValidationMail(email) {

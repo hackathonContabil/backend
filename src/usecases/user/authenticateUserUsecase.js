@@ -1,6 +1,6 @@
 const BadRequestError = require('../../errors/badRequestError');
 
-module.exports = class AuthenticateUserUsecase {
+module.exports = class {
     constructor(userRepository, cryptoProvider, tokenProvider) {
         this.userRepository = userRepository;
         this.cryptoProvider = cryptoProvider;
@@ -14,22 +14,17 @@ module.exports = class AuthenticateUserUsecase {
             throw new BadRequestError('invalid-credentials');
         }
 
-        const passwordIsValid = this.cryptoProvider.compareHash(password, user.password);
-        if (!passwordIsValid) {
+        const isPasswordValid = this.cryptoProvider.compareHash(password, user.password);
+        if (!isPasswordValid) {
             throw new BadRequestError('invalid-credentials');
         }
-        const token = this.tokenProvider.create({
-            id: user.id,
-            email,
-            isAdmin: user.isAdmin,
-            isAccountant: user.isAccountant,
-            isSharingBankAccountData: user.isSharingBankAccountData,
-        });
-        return {
-            token,
+
+        const common = {
             isAdmin: user.isAdmin,
             isAccountant: user.isAccountant,
             isSharingBankAccountData: user.isSharingBankAccountData,
         };
+        const token = this.tokenProvider.create({ id: user.id, email, ...common });
+        return { token, ...common };
     }
 };

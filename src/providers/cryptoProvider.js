@@ -1,7 +1,7 @@
 const { createCipheriv, createDecipheriv } = require('crypto');
 const { hashSync, compareSync, genSaltSync } = require('bcryptjs');
 
-module.exports = class CryptoProvider {
+module.exports = class {
     iv = process.env.CRYPTO_IV;
     algorithm = process.env.CRYPTO_ALGORITHM;
     secretKey = process.env.CRYPTO_SECRET_KEY;

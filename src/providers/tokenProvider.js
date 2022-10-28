@@ -1,18 +1,18 @@
 const { sign, verify } = require('jsonwebtoken');
 
-module.exports = class TokenProvider {
+module.exports = class {
     tokenSecret = process.env.TOKEN_SECRET;
     tokenExpires = process.env.TOKEN_EXPIRES_TIME_IN_HOURS;
 
-    create(tokenInfo) {
+    create(data) {
         const hourInTimeSpanFormat = this.tokenExpires + 'h';
-        return sign(tokenInfo, this.tokenSecret, { expiresIn: hourInTimeSpanFormat });
+        return sign(data, this.tokenSecret, { expiresIn: hourInTimeSpanFormat });
     }
 
-    getInfoIfTokenIsValid(token) {
+    getDataIfIsValid(token) {
         try {
-            const tokenInfo = verify(token, this.tokenSecret);
-            return tokenInfo;
+            const data = verify(token, this.tokenSecret);
+            return data;
         } catch {
             return;
         }

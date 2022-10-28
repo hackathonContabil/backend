@@ -1,6 +1,6 @@
 const { Router } = require('express');
 
-module.exports = class FileController {
+module.exports = class {
     constructor(exportTransactionsUsecase) {
         this.exportTransactionsUsecase = exportTransactionsUsecase;
     }

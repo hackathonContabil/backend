@@ -1,6 +1,6 @@
 const BadRequestError = require('../../errors/badRequestError');
 
-module.exports = class CreateAccountingOfficeUsecase {
+module.exports = class {
     constructor(accountingOfficeRepository) {
         this.accountingOfficeRepository = accountingOfficeRepository;
     }
