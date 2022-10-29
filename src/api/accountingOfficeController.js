@@ -41,7 +41,7 @@ module.exports = class {
         });
 
         router.get('/public', async (_, res) => {
-            const offices = await this.listAccountingOfficesUsecase.execute();
+            const offices = await this.listAccountingOfficesUsecase.execute({});
             const officesToReturn = offices.map(({ id, name }) => {
                 return { id, name };
             });

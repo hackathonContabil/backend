@@ -5,6 +5,19 @@ const compression = require('compression');
 const { engine } = require('express-handlebars');
 const { Sequelize } = require('sequelize');
 const errorHandler = require('./api/middlewares/errorHandler');
+const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/createAccountingOfficeUsecase');
+const DeleteAccountingOfficeUsecase = require('./usecases/accountingOffice/deleteAccountingOfficeUsecase');
+const ListAccountingOfficesUsecase = require('./usecases/accountingOffice/listAccountingOfficesUsecase');
+const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
+const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
+const FillAccountsTransactionsReferencesUsecase = require('./usecases/bankAccount/fillAccountsTransactionsReferencesUsecase');
+const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
+const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
+const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
+const ConfirmEmailUsecase = require('./usecases/user/confirmEmailUsecase');
+const CreateUserUsecase = require('./usecases/user/createUserUsecase');
+const DeleteExpiredUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteExpiredUsersWithNonConfirmedEmailUsecase');
+const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
 const AccountingOffice = require('./models/accountingOffice');
 const BankAccountConnector = require('./models/bankAccountConnector');
 const User = require('./models/user');
@@ -16,25 +29,12 @@ const TokenProvider = require('./providers/tokenProvider');
 const AccountingOfficeRepository = require('./repositories/accountingOfficeRepository');
 const BankAccountRepository = require('./repositories/bankAccountRepository');
 const UserRepository = require('./repositories/userRepository');
-const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
-const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/createAccountingOfficeUsecase');
-const DeleteAccountingOfficeUsecase = require('./usecases/accountingOffice/deleteAccountingOfficeUsecase');
-const ListAccountingOfficesUsecase = require('./usecases/accountingOffice/listAccountingOfficesUsecase');
-const FillAccountsTransactionsReferencesUsecase = require('./usecases/bankAccount/fillAccountsTransactionsReferencesUsecase');
-const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
-const BankAccountController = require('./api/bankAccountController');
-const ConfirmEmailUsecase = require('./usecases/user/confirmEmailUsecase');
 const AccountingOfficeController = require('./api/accountingOfficeController');
-const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
-const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
-const CreateUserUsecase = require('./usecases/user/createUserUsecase');
-const DeleteExpiredUsersWithNonConfirmedEmailUsecase = require('./usecases/user/deleteExpiredUsersWithNonConfirmedEmailUsecase');
-const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
-const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
-const UserScheduler = require('./scheduler/userScheduler');
-const BankAccountScheduler = require('./scheduler/bankAccountScheduler');
+const BankAccountController = require('./api/bankAccountController');
 const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
+const UserScheduler = require('./scheduler/userScheduler');
+const BankAccountScheduler = require('./scheduler/bankAccountScheduler');
 
 module.exports = class AppLauncher {
     httpServerPort = process.env.HTTP_SERVER_PORT;
@@ -104,7 +104,8 @@ module.exports = class AppLauncher {
             accountingOfficeRepository
         );
         const listAccountingOfficesUsecase = new ListAccountingOfficesUsecase(
-            accountingOfficeRepository
+            accountingOfficeRepository,
+            cryptoProvider
         );
         const accountingOfficeController = new AccountingOfficeController(
             createAccountingOfficeUsecase,

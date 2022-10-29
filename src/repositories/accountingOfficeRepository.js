@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const AccountingOffice = require('../models/accountingOffice');
 
 module.exports = class {
@@ -6,12 +7,21 @@ module.exports = class {
         return office.get({ plain: true });
     }
 
-    async findAll() {
-        const connectors = await AccountingOffice.findAll({
-            order: [['name', 'DESC']],
+    async list(page = 0, limit, nameOrDocumentFilter) {
+        const offices = await AccountingOffice.findAll({
+            limit,
+            offset: (limit || 0) * page,
+            order: [
+                ['name', 'DESC'],
+                ['createdAt', 'DESC'],
+                ['updatedAt', 'DESC'],
+            ],
             raw: true,
+            where: nameOrDocumentFilter && {
+                [Op.or]: [{ name: nameOrDocumentFilter }, { document: nameOrDocumentFilter }],
+            },
         });
-        return connectors;
+        return offices;
     }
 
     async findById(id) {
