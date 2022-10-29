@@ -8,6 +8,7 @@ module.exports = class {
         const { total, users } = await this.userRepository.list(
             page,
             limit,
+            filter,
             filter ? this.cryptoProvider.encrypt(filter) : null,
             isAccountant ? accountingOfficeId : null
         );

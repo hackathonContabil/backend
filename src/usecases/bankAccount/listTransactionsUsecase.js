@@ -22,16 +22,15 @@ module.exports = class {
         const formattedTransactions = transactions.map((transaction) => {
             const formattedDate = transaction.transactionDate.toLocaleDateString();
             return {
-                Data: formattedDate,
-                'Tipo de Operação': transaction.description,
-                'Entrada ou Saida': transaction.amount > 0 ? 'Entrada' : 'Saída',
-                'CPF ou CNPJ': transaction.payerType,
-                'Categoria do Pagto ou Recebimento':
-                    transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
-                'Descrição do realizador': transaction.payerName,
-                Documento: transaction.payerDocument,
-                'Valor da Operação': transaction.amount,
-                Saldo: transaction.balance,
+                date: formattedDate,
+                description: transaction.description,
+                type: transaction.amount > 0 ? 'Entrada' : 'Saída',
+                payerType: transaction.payerType,
+                transactionType: transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
+                payerName: transaction.payerName,
+                payerDocument: transaction.payerDocument,
+                amount: transaction.amount,
+                balance: transaction.balance,
             };
         });
         return { count, transactions: formattedTransactions };

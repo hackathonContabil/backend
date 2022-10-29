@@ -65,21 +65,21 @@ module.exports = class {
         });
     }
 
-    async list(page = 0, limit, nameEmailOrDocumentFilter, accountingOfficeId) {
+    async list(page = 0, limit, nameFilter, emailOrDocumentFilter, accountingOfficeId) {
         const filters = {};
-        if (nameEmailOrDocumentFilter && accountingOfficeId) {
+        if (nameFilter && accountingOfficeId) {
             filters[Op.or] = [
-                { name: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
-                { email: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
-                { document: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { name: { [Op.like]: `%${nameFilter.toUpperCase()}%` } },
+                { email: { [Op.like]: `%${emailOrDocumentFilter.toUpperCase()}%` } },
+                { document: { [Op.like]: `%${emailOrDocumentFilter.toUpperCase()}%` } },
             ];
             filters['isClient'] = true;
             filters['accountingOfficeId'] = accountingOfficeId;
-        } else if (nameEmailOrDocumentFilter) {
+        } else if (nameFilter) {
             filters[Op.or] = [
-                { name: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
-                { email: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
-                { document: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { name: { [Op.like]: `%${nameFilter.toUpperCase()}%` } },
+                { email: { [Op.like]: `%${emailOrDocumentFilter.toUpperCase()}%` } },
+                { document: { [Op.like]: `%${emailOrDocumentFilter.toUpperCase()}%` } },
             ];
         } else if (accountingOfficeId) {
             filters['isClient'] = true;
