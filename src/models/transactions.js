@@ -34,9 +34,22 @@ module.exports = class Transactions extends Model {
                 },
                 descriptionRaw: {
                     type: DataTypes.STRING(244),
+                    allowNull: true,
                 },
                 transactionDate: {
                     type: DataTypes.DATE,
+                    allowNull: true,
+                },
+                payerName: {
+                    type: DataTypes.STRING(128),
+                    allowNull: true,
+                },
+                payerType: {
+                    type: DataTypes.STRING(128),
+                    allowNull: true,
+                },
+                payerDocument: {
+                    type: DataTypes.STRING(128),
                     allowNull: true,
                 },
             },

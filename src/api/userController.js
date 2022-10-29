@@ -7,7 +7,6 @@ const {
     createAccountantUserValidation,
 } = require('./userValidation');
 const ensureUserIsAdminOrAccountant = require('./middlewares/ensureUserIsAdminOrAccountant');
-const ensureUserIsClientOrAccountant = require('./middlewares/ensureUserIsClientOrAccountant');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');

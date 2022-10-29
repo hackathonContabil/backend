@@ -51,15 +51,33 @@ module.exports = class {
                 description,
                 descriptionRaw,
                 date: transactionDate,
-            }) => ({
-                userId,
-                transactionCode,
-                amount,
-                balance,
-                description,
-                descriptionRaw,
-                transactionDate,
-            })
+                paymentData,
+            }) => {
+                let payerName = 'Não classificado';
+                let payerType = 'Não classificado';
+                let payerDocument = 'Não classificado';
+                if (paymentData && paymentData.payer) {
+                    if (paymentData.payer.name) {
+                        payerName = paymentData.payer.name;
+                    }
+                    if (paymentData.payer.documentNumber) {
+                        payerType = paymentData.payer.documentNumber.type;
+                        payerDocument = paymentData.payer.documentNumber.value;
+                    }
+                }
+                return {
+                    userId,
+                    transactionCode,
+                    amount,
+                    balance,
+                    description,
+                    descriptionRaw,
+                    transactionDate,
+                    payerName,
+                    payerType,
+                    payerDocument,
+                };
+            }
         );
         await this.transactionsRepository.saveBatch(transactionsToSave);
     }

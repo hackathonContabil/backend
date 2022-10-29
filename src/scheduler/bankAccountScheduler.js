@@ -6,7 +6,7 @@ module.exports = class {
     }
 
     init() {
-        schedule.scheduleJob('*/15 * * * * *', () => {
+        schedule.scheduleJob('*/45 * * * * *', () => {
             try {
                 this.fillAccountsTransactionsReferencesUsecase.execute();
             } catch (error) {

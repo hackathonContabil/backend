@@ -3,9 +3,16 @@ const { listTransactionsValidation } = require('./bankAccountValidation');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsClient = require('./middlewares/ensureUserIsClient');
 const ensureUserIsClientOrAccountant = require('./middlewares/ensureUserIsClientOrAccountant');
+const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 
 module.exports = class {
-    constructor(connectBankAccountUsecase, listTransactionsUsecase, bankAccountDataProvider) {
+    constructor(
+        exportTransactionsDataSpreadsheetUsecase,
+        connectBankAccountUsecase,
+        listTransactionsUsecase,
+        bankAccountDataProvider
+    ) {
+        this.exportTransactionsDataSpreadsheetUsecase = exportTransactionsDataSpreadsheetUsecase;
         this.connectBankAccountUsecase = connectBankAccountUsecase;
         this.listTransactionsUsecase = listTransactionsUsecase;
         this.bankAccountDataProvider = bankAccountDataProvider;
@@ -18,6 +25,26 @@ module.exports = class {
             const banks = this.bankAccountDataProvider.getBanks();
             return res.json({ status: 'success', data: banks });
         });
+
+        router.get(
+            '/export/banking-reconciliation/:id',
+            ensureAuthentication,
+            ensureUserIsAccountant,
+            async (req, res) => {
+                const { from, to } = req.query;
+                const { id: userId } = req.params;
+
+                const spreadsheet = await this.exportTransactionsDataSpreadsheetUsecase.execute({
+                    from,
+                    to,
+                    userId,
+                    accountingOfficeId: req.user.accountingOfficeId,
+                    type: 'banking-reconciliation',
+                });
+                const fileName = `dados-${Date.now()}.csv`;
+                return res.attachment(fileName).send(spreadsheet);
+            }
+        );
 
         router.post('/', ensureAuthentication, ensureUserIsClient, async (req, res) => {
             const { bank, credentials } = req.body;

@@ -1,23 +1,45 @@
-const BadRequestError = require('../../errors/badRequestError');
-
 module.exports = class {
-    constructor(tokenProvider, spreadsheetProvider) {
+    constructor(transactionsRepository, userRepository, tokenProvider, spreadsheetProvider) {
+        this.transactionsRepository = transactionsRepository;
+        this.userRepository = userRepository;
         this.tokenProvider = tokenProvider;
         this.spreadsheetProvider = spreadsheetProvider;
     }
 
-    execute(transactionsOptionsToken) {
-        const transactionsOptions = this.tokenProvider.getDataIfIsValid(transactionsOptionsToken);
-        if (!transactionsOptions) {
-            throw new BadRequestError('invalid-token');
+    async execute({ type, from, to, userId, accountingOfficeId }) {
+        const user = await this.userRepository.findById(userId);
+        if (user.isClient && user.accountingOfficeId !== accountingOfficeId) {
+            throw new BadRequestError('invalid-credentials');
         }
-        const data = [
-            { field1: 10, field2: 2022, field3: 100 },
-            { field1: -10, field2: 2022, field3: 90 },
-            { field1: 30, field2: 2022, field3: 120 },
-            { field1: 10, field2: 2022, field3: 130 },
-        ];
-        const spreadsheet = this.spreadsheetProvider.getTransactionsDataSpreadsheet(data);
+        let data = [];
+        switch (type) {
+            case 'banking-reconciliation':
+                data = await this.bankingReconciliation({ userId, from, to });
+        }
+        const spreadsheet = this.spreadsheetProvider.bankingReconciliationSpreadsheet(data);
         return spreadsheet;
+    }
+
+    async bankingReconciliation(filter) {
+        const { transactions } = await this.transactionsRepository.list(
+            undefined,
+            undefined,
+            filter
+        );
+        return transactions.map((transaction) => {
+            const formattedDate = transaction.transactionDate.toLocaleDateString();
+            return {
+                Data: formattedDate,
+                'Tipo de Operação': transaction.description,
+                'Entrada ou Saida': transaction.amount > 0 ? 'Entrada' : 'Saída',
+                'CPF ou CNPJ': transaction.payerType,
+                'Categoria do Pagto ou Recebimento':
+                    transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
+                'Descrição do realizador': transaction.payerName,
+                Documento: transaction.payerDocument,
+                'Valor da Operação': transaction.amount,
+                Saldo: transaction.balance,
+            };
+        });
     }
 };

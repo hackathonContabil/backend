@@ -34,7 +34,6 @@ const TransactionsRepository = require('./repositories/transactionsRepository');
 const UserRepository = require('./repositories/userRepository');
 const AccountingOfficeController = require('./api/accountingOfficeController');
 const BankAccountController = require('./api/bankAccountController');
-const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
 const UserScheduler = require('./scheduler/userScheduler');
 const BankAccountScheduler = require('./scheduler/bankAccountScheduler');
@@ -160,6 +159,13 @@ module.exports = class AppLauncher {
         userScheduler.init();
 
         //  Bank account modules
+        const exportTransactionsDataSpreadsheetUsecase =
+            new ExportTransactionsDataSpreadsheetUsecase(
+                transactionsRepository,
+                userRepository,
+                tokenProvider,
+                spreadsheetProvider
+            );
         const connectBankAccountUsecase = new ConnectBankAccountUsecase(
             bankAccountRepository,
             cryptoProvider,
@@ -170,6 +176,7 @@ module.exports = class AppLauncher {
             userRepository
         );
         const bankAccountController = new BankAccountController(
+            exportTransactionsDataSpreadsheetUsecase,
             connectBankAccountUsecase,
             listTransactionsUsecase,
             bankAccountDataProvider
@@ -187,11 +194,5 @@ module.exports = class AppLauncher {
             fillAccountsTransactionsReferencesUsecase
         );
         bankAccountScheduler.init();
-
-        // File modules
-        const exportTransactionsDataSpreadsheetUsecase =
-            new ExportTransactionsDataSpreadsheetUsecase(tokenProvider, spreadsheetProvider);
-        const fileController = new FileController(exportTransactionsDataSpreadsheetUsecase);
-        this.expressServer.use('/api/v1/file', fileController.router());
     }
 };
