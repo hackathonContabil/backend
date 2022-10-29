@@ -16,7 +16,10 @@ module.exports = class {
         if (officeWithSameName || officeWithSameDocument) {
             throw new BadRequestError('invalid-credentials');
         }
-        const office = await this.accountingOfficeRepository.save({ name, encryptedDocument });
+        const office = await this.accountingOfficeRepository.save({
+            name,
+            document: encryptedDocument,
+        });
         return office;
     }
 };

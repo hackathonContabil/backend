@@ -1,5 +1,9 @@
+function normalizeName(name) {
+    return name.toUpperCase();
+}
+
 function normalizeEmail(email) {
     return email.toLowerCase();
 }
 
-module.exports = { normalizeEmail };
+module.exports = { normalizeName, normalizeEmail };

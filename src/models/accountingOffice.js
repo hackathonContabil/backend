@@ -17,7 +17,6 @@ module.exports = class AccountingOffice extends Model {
                 document: {
                     type: DataTypes.STRING(32),
                     unique: true,
-                    allowNull: true,
                 },
             },
             { tableName: 'accountingOffices', sequelize, timestamps: true }

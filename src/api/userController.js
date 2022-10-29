@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { normalizeEmail } = require('../helper');
+const { normalizeName, normalizeEmail } = require('../helper');
 const {
     listUsersValidation,
     authenticateUserValidation,
@@ -100,7 +100,7 @@ module.exports = class {
             const { name, email, phone, password, document, accountingOfficeId } = req.body;
 
             const user = await this.createUserUsecase.execute({
-                name,
+                name: normalizeName(name),
                 phone,
                 email: normalizeEmail(email),
                 password,

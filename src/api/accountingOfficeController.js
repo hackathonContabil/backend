@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { normalizeName } = require('../helper');
 const { createAccountingOfficeValidation } = require('./accountingOfficeValidation');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
@@ -26,9 +27,10 @@ module.exports = class {
                 const { name, document } = req.body;
 
                 const accountingOffice = await this.createAccountingOfficeUsecase.execute({
-                    name,
+                    name: normalizeName(name),
                     document,
                 });
+                delete accountingOffice.document;
                 return res.status(201).json({ status: 'success', data: { accountingOffice } });
             }
         );
