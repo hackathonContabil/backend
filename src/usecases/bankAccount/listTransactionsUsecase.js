@@ -22,6 +22,7 @@ module.exports = class {
         const formattedTransactions = transactions.map((transaction) => {
             const formattedDate = transaction.transactionDate.toLocaleDateString();
             return {
+                id: transaction.id,
                 date: formattedDate,
                 description: transaction.description,
                 type: transaction.amount > 0 ? 'Entrada' : 'Saída',
