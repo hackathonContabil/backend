@@ -74,13 +74,13 @@ module.exports = class {
         });
 
         router.post('/accountant', createAccountantUserValidation, async (req, res) => {
-            const { name, email, password, accountantState, accountingOfficeId } = req.body;
+            const { name, email, password, accountantLicense, accountingOfficeId } = req.body;
 
             const user = await this.createUserUsecase.execute({
                 name,
                 email: normalizeEmail(email),
                 password,
-                accountantState,
+                accountantLicense,
                 accountingOfficeId,
                 isAccountant: true,
             });
@@ -88,6 +88,7 @@ module.exports = class {
             delete user.email;
             delete user.password;
             delete user.document;
+            delete user.accountantLicense;
             delete user.isSharingBankAccountData;
             return res.status(201).json({ status: 'success', data: { user } });
         });
@@ -120,7 +121,7 @@ module.exports = class {
             delete user.email;
             delete user.password;
             delete user.document;
-            delete user.accountantState;
+            delete user.accountantLicense;
             return res.status(201).json({ status: 'success', data: { user } });
         });
 

@@ -66,8 +66,8 @@ module.exports = class User extends Model {
                     defaultValue: false,
                     allowNull: false,
                 },
-                accountantState: {
-                    type: DataTypes.STRING(2),
+                accountantLicense: {
+                    type: DataTypes.STRING(64),
                     allowNull: true,
                 },
                 accountingOfficeId: {

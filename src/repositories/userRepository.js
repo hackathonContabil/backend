@@ -27,6 +27,11 @@ module.exports = class {
         return user;
     }
 
+    async findByAccountantLicense(accountantLicense) {
+        const user = await User.findOne({ where: { accountantLicense }, raw: true });
+        return user;
+    }
+
     async activate(id) {
         const user = await User.update(
             { isActive: true, activatedAt: new Date() },

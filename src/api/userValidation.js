@@ -31,7 +31,7 @@ const createAccountantUserValidation = validate({
         name: joi.string().required().label('Nome').min(8).max(128),
         email: joi.string().email().label('E-mail').max(128),
         password: joi.string().required().label('Senha').min(8).max(128),
-        accountantState: joi.string().required().label('CRC').length(2),
+        accountantLicense: joi.string().required().label('CRC').length(11),
         accountingOfficeId: joi.number().required().label('Escritório').min(1),
     },
 });

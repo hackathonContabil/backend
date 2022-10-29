@@ -24,21 +24,36 @@ module.exports = class {
         isAdmin,
         isClient,
         isAccountant,
-        accountantState,
+        accountantLicense,
         accountingOfficeId,
     }) {
         const encryptedEmail = this.cryptoProvider.encrypt(email);
         const encryptedPhone = phone ? this.cryptoProvider.encrypt(phone) : null;
         const encryptedDocument = document ? this.cryptoProvider.encrypt(document) : null;
+        const encryptedLicense = accountantLicense
+            ? this.cryptoProvider.encrypt(accountantLicense)
+            : null;
 
-        const [isEmailInvalid, isPhoneInvalid, isDocumentInvalid, isAccountingOfficeValid] =
-            await Promise.all([
-                this.findUserByPhoneIfItExists(encryptedPhone),
-                this.userRepository.findByEmail(encryptedEmail),
-                this.findUserByDocumentIfItExists(encryptedDocument),
-                this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
-            ]);
-        if (isPhoneInvalid || isEmailInvalid || isDocumentInvalid || !isAccountingOfficeValid) {
+        const [
+            isEmailInvalid,
+            isPhoneInvalid,
+            isDocumentInvalid,
+            isAccountingOfficeValid,
+            isAccountantLicenseInValid,
+        ] = await Promise.all([
+            this.findUserByPhoneIfItExists(encryptedPhone),
+            this.userRepository.findByEmail(encryptedEmail),
+            this.findUserByDocumentIfItExists(encryptedDocument),
+            this.findAccountingOfficeByIdIfItExists(accountingOfficeId),
+            this.findUserByAccountingLicenseIfItExists(encryptedLicense),
+        ]);
+        if (
+            isPhoneInvalid ||
+            isEmailInvalid ||
+            isDocumentInvalid ||
+            !isAccountingOfficeValid ||
+            isAccountantLicenseInValid
+        ) {
             throw new BadRequestError('invalid-credentials');
         }
         const user = await this.userRepository.save({
@@ -50,8 +65,7 @@ module.exports = class {
             isAdmin,
             isClient,
             isAccountant,
-            accountantState,
-            accountingOfficeId,
+            accountantLicense: encryptedLicense,
         });
         this.sendValidationMail(email);
         return user;
@@ -70,6 +84,14 @@ module.exports = class {
             return;
         }
         const user = await this.userRepository.findByDocument(document);
+        return user;
+    }
+
+    async findUserByAccountingLicenseIfItExists(license) {
+        if (!license) {
+            return;
+        }
+        const user = await this.userRepository.findByAccountantLicense(license);
         return user;
     }
 
