@@ -69,17 +69,17 @@ module.exports = class {
         const filters = {};
         if (nameEmailOrDocumentFilter && accountingOfficeId) {
             filters[Op.or] = [
-                { name: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
-                { email: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
-                { document: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { name: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { email: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { document: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
             ];
             filters['isClient'] = true;
             filters['accountingOfficeId'] = accountingOfficeId;
         } else if (nameEmailOrDocumentFilter) {
             filters[Op.or] = [
-                { name: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
-                { email: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
-                { document: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { name: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { email: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
+                { document: { [Op.like]: `%${nameEmailOrDocumentFilter.toUpperCase()}%` } },
             ];
         } else if (accountingOfficeId) {
             filters['isClient'] = true;

@@ -19,8 +19,8 @@ module.exports = class {
             raw: true,
             where: nameFilter && {
                 [Op.or]: [
-                    { name: { [Op.like]: `${nameFilter}` } },
-                    { document: { [Op.like]: `${documentFilter}` } },
+                    { name: { [Op.like]: `%${nameFilter.toUpperCase()}%` } },
+                    { document: { [Op.like]: `%${documentFilter.toUpperCase()}%` } },
                 ],
             },
         });
