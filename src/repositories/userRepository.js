@@ -69,17 +69,17 @@ module.exports = class {
         const filters = {};
         if (nameEmailOrDocumentFilter && accountingOfficeId) {
             filters[Op.or] = [
-                { name: nameEmailOrDocumentFilter },
-                { email: nameEmailOrDocumentFilter },
-                { document: nameEmailOrDocumentFilter },
+                { name: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { email: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { document: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
             ];
             filters['isClient'] = true;
             filters['accountingOfficeId'] = accountingOfficeId;
         } else if (nameEmailOrDocumentFilter) {
             filters[Op.or] = [
-                { name: nameEmailOrDocumentFilter },
-                { email: nameEmailOrDocumentFilter },
-                { document: nameEmailOrDocumentFilter },
+                { name: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { email: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
+                { document: { [Op.like]: `${nameEmailOrDocumentFilter}` } },
             ];
         } else if (accountingOfficeId) {
             filters['isClient'] = true;

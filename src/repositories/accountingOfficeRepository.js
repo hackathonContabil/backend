@@ -18,7 +18,10 @@ module.exports = class {
             ],
             raw: true,
             where: nameFilter && {
-                [Op.or]: [{ name: nameFilter }, { document: documentFilter }],
+                [Op.or]: [
+                    { name: { [Op.like]: `${nameFilter}` } },
+                    { document: { [Op.like]: `${documentFilter}` } },
+                ],
             },
         });
         return offices;
