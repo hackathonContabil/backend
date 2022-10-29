@@ -171,7 +171,8 @@ module.exports = class AppLauncher {
         );
         const bankAccountController = new BankAccountController(
             connectBankAccountUsecase,
-            listTransactionsUsecase
+            listTransactionsUsecase,
+            bankAccountDataProvider
         );
         this.expressServer.use('/api/v1/bank-account', bankAccountController.router());
 

@@ -23,6 +23,11 @@ module.exports = class {
         }
     }
 
+    getBanks() {
+        const banks = Object.values(pluggyBankData);
+        return banks;
+    }
+
     async getSandboxConnector() {
         const DEFAULT_USER = 'user-ok';
         const DEFAULT_PASSWORD = 'password-ok';

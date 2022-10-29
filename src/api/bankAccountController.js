@@ -5,13 +5,19 @@ const ensureUserIsClient = require('./middlewares/ensureUserIsClient');
 const ensureUserIsClientOrAccountant = require('./middlewares/ensureUserIsClientOrAccountant');
 
 module.exports = class {
-    constructor(connectBankAccountUsecase, listTransactionsUsecase) {
+    constructor(connectBankAccountUsecase, listTransactionsUsecase, bankAccountDataProvider) {
         this.connectBankAccountUsecase = connectBankAccountUsecase;
         this.listTransactionsUsecase = listTransactionsUsecase;
+        this.bankAccountDataProvider = bankAccountDataProvider;
     }
 
     router() {
         const router = Router();
+
+        router.get('/', ensureAuthentication, ensureUserIsClient, async (_, res) => {
+            const banks = this.bankAccountDataProvider.getBanks();
+            return res.json({ status: 'success', data: banks });
+        });
 
         router.post('/', ensureAuthentication, ensureUserIsClient, async (req, res) => {
             const { bank, credentials } = req.body;

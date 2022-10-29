@@ -5,12 +5,13 @@ module.exports = class {
     }
 
     async execute({ page, limit, filter }) {
-        const offices = await this.accountingOfficeRepository.list(
+        const { rows: offices, count } = await this.accountingOfficeRepository.list(
             page,
             limit,
+            filter,
             filter ? this.cryptoProvider.encrypt(filter) : null
         );
-        return this.decryptData(offices);
+        return { count, offices: this.decryptData(offices) };
     }
 
     decryptData(offices) {
