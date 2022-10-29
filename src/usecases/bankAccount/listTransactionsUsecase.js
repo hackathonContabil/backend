@@ -24,10 +24,10 @@ module.exports = class {
             return {
                 id: transaction.id,
                 date: formattedDate,
-                description: transaction.description,
-                type: transaction.amount > 0 ? 'Entrada' : 'Saída',
+                operationType: transaction.description,
+                inOrOut: transaction.amount > 0 ? 'Entrada' : 'Saída',
                 payerType: transaction.payerType,
-                transactionType: transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
+                category: transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
                 payerName: transaction.payerName,
                 payerDocument: transaction.payerDocument,
                 amount: transaction.amount,
