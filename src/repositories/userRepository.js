@@ -65,7 +65,26 @@ module.exports = class {
         });
     }
 
-    async list(page = 0, limit, nameEmailOrDocumentFilter) {
+    async list(page = 0, limit, nameEmailOrDocumentFilter, accountingOfficeId) {
+        const filters = {};
+        if (nameEmailOrDocumentFilter && accountingOfficeId) {
+            filters[Op.or] = [
+                { name: nameEmailOrDocumentFilter },
+                { email: nameEmailOrDocumentFilter },
+                { document: nameEmailOrDocumentFilter },
+            ];
+            filters['isClient'] = true;
+            filters['accountingOfficeId'] = accountingOfficeId;
+        } else if (nameEmailOrDocumentFilter) {
+            filters[Op.or] = [
+                { name: nameEmailOrDocumentFilter },
+                { email: nameEmailOrDocumentFilter },
+                { document: nameEmailOrDocumentFilter },
+            ];
+        } else if (accountingOfficeId) {
+            filters['isClient'] = true;
+            filters['accountingOfficeId'] = accountingOfficeId;
+        }
         const { count: total, rows: users } = await User.findAndCountAll({
             attributes: { exclude: ['password'] },
             limit,
@@ -78,13 +97,7 @@ module.exports = class {
                 ['updatedAt', 'DESC'],
             ],
             raw: true,
-            where: nameEmailOrDocumentFilter && {
-                [Op.or]: [
-                    { name: nameEmailOrDocumentFilter },
-                    { email: nameEmailOrDocumentFilter },
-                    { document: nameEmailOrDocumentFilter },
-                ],
-            },
+            where: filters,
         });
         return { total, users };
     }

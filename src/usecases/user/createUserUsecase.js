@@ -66,6 +66,7 @@ module.exports = class {
             isClient,
             isAccountant,
             accountantLicense: encryptedLicense,
+            accountingOfficeId,
         });
         this.sendValidationMail(email);
         return user;

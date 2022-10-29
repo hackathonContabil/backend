@@ -6,6 +6,8 @@ const {
     createClientUserValidation,
     createAccountantUserValidation,
 } = require('./userValidation');
+const ensureUserIsAdminOrAccountant = require('./middlewares/ensureUserIsAdminOrAccountant');
+const ensureUserIsClientOrAccountant = require('./middlewares/ensureUserIsClientOrAccountant');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
@@ -33,12 +35,19 @@ module.exports = class {
         router.get(
             '/',
             ensureAuthentication,
-            ensureUserIsAccountant,
+            ensureUserIsAdminOrAccountant,
             listUsersValidation,
             async (req, res) => {
                 const { page, limit, filter } = req.query;
+                const { isAccountant, accountingOfficeId } = req.user;
 
-                const users = await this.listUsersUsecase.execute({ page, limit, filter }, {});
+                const users = await this.listUsersUsecase.execute({
+                    page,
+                    limit,
+                    filter,
+                    isAccountant,
+                    accountingOfficeId,
+                });
                 return res.json({ status: 'success', data: { users } });
             }
         );
