@@ -50,7 +50,15 @@ module.exports = class {
                 email: normalizeEmail(email),
                 password,
             });
-            return res.json({ status: 'success', data: { ...authenticationData } });
+            return res.json({ status: 'success', data: authenticationData });
+        });
+
+        router.get('/auth/validate', ensureAuthentication, async (req, res) => {
+            const { isAdmin, isClient, isAccountant, isSharingBankAccountData } = req.user;
+            return res.json({
+                status: 'success',
+                data: { isAdmin, isClient, isAccountant, isSharingBankAccountData },
+            });
         });
 
         router.get('/confirm-email/:token', async (req, res) => {
