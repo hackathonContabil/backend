@@ -20,6 +20,7 @@ const DeleteExpiredUsersWithNonConfirmedEmailUsecase = require('./usecases/user/
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
 const AccountingOffice = require('./models/accountingOffice');
 const BankAccountConnector = require('./models/bankAccountConnector');
+const Transactions = require('./models/transactions');
 const User = require('./models/user');
 const BankAccountDataProvider = require('./providers/bankAccountDataProvider');
 const CryptoProvider = require('./providers/cryptoProvider');
@@ -28,6 +29,7 @@ const SpreadsheetProvider = require('./providers/spreadsheetProvider');
 const TokenProvider = require('./providers/tokenProvider');
 const AccountingOfficeRepository = require('./repositories/accountingOfficeRepository');
 const BankAccountRepository = require('./repositories/bankAccountRepository');
+const TransactionsRepository = require('./repositories/transactionsRepository');
 const UserRepository = require('./repositories/userRepository');
 const AccountingOfficeController = require('./api/accountingOfficeController');
 const BankAccountController = require('./api/bankAccountController');
@@ -70,8 +72,10 @@ module.exports = class AppLauncher {
 
             AccountingOffice.init(sequelize);
             BankAccountConnector.init(sequelize);
+            Transactions.init(sequelize);
             User.init(sequelize);
             User.hasMany(BankAccountConnector, { foreignKey: 'userId' });
+            User.hasMany(Transactions, { foreignKey: 'userId' });
             AccountingOffice.hasMany(User, {
                 onDelete: 'CASCADE',
                 foreignKey: 'accountingOfficeId',
@@ -93,6 +97,7 @@ module.exports = class AppLauncher {
         const tokenProvider = new TokenProvider();
         const accountingOfficeRepository = new AccountingOfficeRepository();
         const bankAccountRepository = new BankAccountRepository();
+        const transactionsRepository = new TransactionsRepository();
         const userRepository = new UserRepository();
 
         // Accounting Office modules
@@ -171,6 +176,7 @@ module.exports = class AppLauncher {
         const fillAccountsTransactionsReferencesUsecase =
             new FillAccountsTransactionsReferencesUsecase(
                 bankAccountRepository,
+                transactionsRepository,
                 cryptoProvider,
                 bankAccountDataProvider
             );

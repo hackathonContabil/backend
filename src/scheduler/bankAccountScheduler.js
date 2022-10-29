@@ -6,8 +6,12 @@ module.exports = class {
     }
 
     init() {
-        schedule.scheduleJob('5 * * * * *', () => {
-            this.fillAccountsTransactionsReferencesUsecase.execute();
+        schedule.scheduleJob('*/15 * * * * *', () => {
+            try {
+                this.fillAccountsTransactionsReferencesUsecase.execute();
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 };

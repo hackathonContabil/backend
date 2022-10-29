@@ -35,9 +35,9 @@ module.exports = class {
 
     async getTransactionsReferenceByConnector(connector) {
         const {
-            results: [accounts],
+            results: [account],
         } = await this.client.fetchAccounts(connector);
-        return accounts.id;
+        return account.id;
     }
 
     async getTransactions(transactionsReference) {
@@ -46,10 +46,10 @@ module.exports = class {
             const { totalPages, page, results } = await this.client.fetchTransactions(
                 transactionsReference
             );
+            transactions.push(...results);
             if (page === totalPages) {
                 break;
             }
-            transactions.push(results);
         }
         return transactions;
     }

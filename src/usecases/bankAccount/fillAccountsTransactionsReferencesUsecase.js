@@ -1,6 +1,12 @@
 module.exports = class {
-    constructor(bankAccountRepository, cryptoProvider, bankAccountDataProvider) {
+    constructor(
+        bankAccountRepository,
+        transactionsRepository,
+        cryptoProvider,
+        bankAccountDataProvider
+    ) {
         this.bankAccountRepository = bankAccountRepository;
+        this.transactionsRepository = transactionsRepository;
         this.cryptoProvider = cryptoProvider;
         this.bankAccountDataProvider = bankAccountDataProvider;
     }
@@ -19,7 +25,7 @@ module.exports = class {
         await Promise.all(accountsToUpdate);
     }
 
-    async updateTransactionsReference({ id, connector }) {
+    async updateTransactionsReference({ id, userId, connector }) {
         const decryptedConnector = this.cryptoProvider.decrypt(connector);
         const transactionsReference =
             await this.bankAccountDataProvider.getTransactionsReferenceByConnector(
@@ -30,5 +36,31 @@ module.exports = class {
             id,
             encryptedTransactionsReference
         );
+        await this.fillTransactions(userId, transactionsReference);
+    }
+
+    async fillTransactions(userId, transactionsReference) {
+        const transactions = await this.bankAccountDataProvider.getTransactions(
+            transactionsReference
+        );
+        const transactionsToSave = transactions.map(
+            ({
+                id: transactionCode,
+                amount,
+                balance,
+                description,
+                descriptionRaw,
+                date: transactionDate,
+            }) => ({
+                userId,
+                transactionCode,
+                amount,
+                balance,
+                description,
+                descriptionRaw,
+                transactionDate,
+            })
+        );
+        await this.transactionsRepository.saveBatch(transactionsToSave);
     }
 };

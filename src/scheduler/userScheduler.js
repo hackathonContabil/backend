@@ -7,8 +7,12 @@ module.exports = class {
     }
 
     init() {
-        schedule.scheduleJob('* 1 * * * *', () => {
-            this.deleteExpiredUsersWithNonConfirmedEmailUsecase.execute();
+        schedule.scheduleJob('* */1 * * * *', () => {
+            try {
+                this.deleteExpiredUsersWithNonConfirmedEmailUsecase.execute();
+            } catch (error) {
+                console.log(error);
+            }
         });
     }
 };
