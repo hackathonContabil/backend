@@ -4,9 +4,14 @@ const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 
 module.exports = class {
-    constructor(createAccountingOfficeUsecase, deleteAccountingOfficeUsecase) {
+    constructor(
+        createAccountingOfficeUsecase,
+        deleteAccountingOfficeUsecase,
+        listAccountingOfficesUsecase
+    ) {
         this.createAccountingOfficeUsecase = createAccountingOfficeUsecase;
         this.deleteAccountingOfficeUsecase = deleteAccountingOfficeUsecase;
+        this.listAccountingOfficesUsecase = listAccountingOfficesUsecase;
     }
 
     router() {
@@ -33,6 +38,14 @@ module.exports = class {
 
             await this.deleteAccountingOfficeUsecase.execute(id);
             return res.status(204).send();
+        });
+
+        router.get('/public', async (_, res) => {
+            const offices = await this.listAccountingOfficesUsecase.execute();
+            const officesToReturn = offices.map(({ id, name }) => {
+                return { id, name };
+            });
+            return res.json({ status: 'success', data: officesToReturn });
         });
         return router;
     }

@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
-const ensureUserIsAccountant = require('./middlewares/ensureUserIsAccountant');
+const ensureUserIsClient = require('./middlewares/ensureUserIsClient');
 
 module.exports = class {
     constructor(connectBankAccountUsecase) {
@@ -10,11 +10,11 @@ module.exports = class {
     router() {
         const router = Router();
 
-        router.post('/', ensureAuthentication, ensureUserIsAccountant, async (req, res) => {
-            const { userId, bank, credentials } = req.body;
+        router.post('/', ensureAuthentication, ensureUserIsClient, async (req, res) => {
+            const { bank, credentials } = req.body;
 
             const bankAccount = await this.connectBankAccountUsecase.execute({
-                userId,
+                userId: req.user.id,
                 bank,
                 credentials,
             });

@@ -21,6 +21,9 @@ module.exports = class BankAccountConnector extends Model {
                     type: DataTypes.STRING(64),
                     allowNull: false,
                 },
+                transactionsReference: {
+                    type: DataTypes.STRING(64),
+                },
             },
             { tableName: 'bankAccountConnectors', sequelize, timestamps: true }
         );

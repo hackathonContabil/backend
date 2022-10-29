@@ -23,11 +23,34 @@ module.exports = class {
         }
     }
 
-    async createSandboxAccountConnectionId({ user, password }) {
-        const { id: connectionId } = await this.client.createItem(pluggyBankData.SANDBOX.id, {
-            user: `user-${user}`,
-            password: `password-${password}`,
+    async getSandboxConnector() {
+        const DEFAULT_USER = 'user-ok';
+        const DEFAULT_PASSWORD = 'password-ok';
+        const { id: connector } = await this.client.createItem(pluggyBankData.SANDBOX.id, {
+            user: DEFAULT_USER,
+            password: DEFAULT_PASSWORD,
         });
-        return connectionId;
+        return connector;
+    }
+
+    async getTransactionsReferenceByConnector(connector) {
+        const {
+            results: [accounts],
+        } = await this.client.fetchAccounts(connector);
+        return accounts.id;
+    }
+
+    async getTransactions(transactionsReference) {
+        const transactions = [];
+        while (true) {
+            const { totalPages, page, results } = await this.client.fetchTransactions(
+                transactionsReference
+            );
+            if (page === totalPages) {
+                break;
+            }
+            transactions.push(results);
+        }
+        return transactions;
     }
 };

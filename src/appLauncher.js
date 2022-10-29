@@ -14,11 +14,13 @@ const MailProvider = require('./providers/mailProvider');
 const SpreadsheetProvider = require('./providers/spreadsheetProvider');
 const TokenProvider = require('./providers/tokenProvider');
 const AccountingOfficeRepository = require('./repositories/accountingOfficeRepository');
-const BankAccountConnectorRepository = require('./repositories/bankAccountConnectorRepository');
+const BankAccountRepository = require('./repositories/bankAccountRepository');
 const UserRepository = require('./repositories/userRepository');
+const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
 const CreateAccountingOfficeUsecase = require('./usecases/accountingOffice/createAccountingOfficeUsecase');
 const DeleteAccountingOfficeUsecase = require('./usecases/accountingOffice/deleteAccountingOfficeUsecase');
-const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
+const ListAccountingOfficesUsecase = require('./usecases/accountingOffice/listAccountingOfficesUsecase');
+const FillAccountsTransactionsReferencesUsecase = require('./usecases/bankAccount/fillAccountsTransactionsReferencesUsecase');
 const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const BankAccountController = require('./api/bankAccountController');
 const ConfirmEmailUsecase = require('./usecases/user/confirmEmailUsecase');
@@ -30,6 +32,7 @@ const DeleteExpiredUsersWithNonConfirmedEmailUsecase = require('./usecases/user/
 const ListUsersUsecase = require('./usecases/user/listUsersUsecase');
 const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
 const UserScheduler = require('./scheduler/userScheduler');
+const BankAccountScheduler = require('./scheduler/bankAccountScheduler');
 const FileController = require('./api/fileController');
 const UserController = require('./api/userController');
 
@@ -89,7 +92,7 @@ module.exports = class AppLauncher {
         const spreadsheetProvider = new SpreadsheetProvider();
         const tokenProvider = new TokenProvider();
         const accountingOfficeRepository = new AccountingOfficeRepository();
-        const bankAccountConnectorRepository = new BankAccountConnectorRepository();
+        const bankAccountRepository = new BankAccountRepository();
         const userRepository = new UserRepository();
 
         // Accounting Office modules
@@ -100,9 +103,13 @@ module.exports = class AppLauncher {
         const deleteAccountingOfficeUsecase = new DeleteAccountingOfficeUsecase(
             accountingOfficeRepository
         );
+        const listAccountingOfficesUsecase = new ListAccountingOfficesUsecase(
+            accountingOfficeRepository
+        );
         const accountingOfficeController = new AccountingOfficeController(
             createAccountingOfficeUsecase,
-            deleteAccountingOfficeUsecase
+            deleteAccountingOfficeUsecase,
+            listAccountingOfficesUsecase
         );
         this.expressServer.use('/api/v1/accounting-office', accountingOfficeController.router());
 
@@ -146,7 +153,8 @@ module.exports = class AppLauncher {
 
         //  Bank account modules
         const connectBankAccountUsecase = new ConnectBankAccountUsecase(
-            bankAccountConnectorRepository,
+            bankAccountRepository,
+            userRepository,
             cryptoProvider,
             bankAccountDataProvider
         );
@@ -158,5 +166,16 @@ module.exports = class AppLauncher {
             new ExportTransactionsDataSpreadsheetUsecase(tokenProvider, spreadsheetProvider);
         const fileController = new FileController(exportTransactionsDataSpreadsheetUsecase);
         this.expressServer.use('/api/v1/file', fileController.router());
+
+        const fillAccountsTransactionsReferencesUsecase =
+            new FillAccountsTransactionsReferencesUsecase(
+                bankAccountRepository,
+                cryptoProvider,
+                bankAccountDataProvider
+            );
+        const bankAccountScheduler = new BankAccountScheduler(
+            fillAccountsTransactionsReferencesUsecase
+        );
+        bankAccountScheduler.init();
     }
 };

@@ -6,6 +6,14 @@ module.exports = class {
         return office.get({ plain: true });
     }
 
+    async findAll() {
+        const connectors = await AccountingOffice.findAll({
+            order: [['name', 'DESC']],
+            raw: true,
+        });
+        return connectors;
+    }
+
     async findById(id) {
         const office = await AccountingOffice.findOne({ where: { id } }, { raw: true });
         return office;
