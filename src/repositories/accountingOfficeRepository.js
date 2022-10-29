@@ -7,8 +7,8 @@ module.exports = class {
         return office.get({ plain: true });
     }
 
-    async list(page = 0, limit, nameOrDocumentFilter) {
-        const offices = await AccountingOffice.findAll({
+    async list(page = 0, limit, nameFilter, documentFilter) {
+        const offices = await AccountingOffice.findAndCountAll({
             limit,
             offset: (limit || 0) * page,
             order: [
@@ -17,8 +17,8 @@ module.exports = class {
                 ['updatedAt', 'DESC'],
             ],
             raw: true,
-            where: nameOrDocumentFilter && {
-                [Op.or]: [{ name: nameOrDocumentFilter }, { document: nameOrDocumentFilter }],
+            where: nameFilter && {
+                [Op.or]: [{ name: nameFilter }, { document: documentFilter }],
             },
         });
         return offices;

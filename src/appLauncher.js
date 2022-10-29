@@ -81,6 +81,7 @@ module.exports = class AppLauncher {
                 onDelete: 'CASCADE',
                 foreignKey: 'accountingOfficeId',
             });
+            User.belongsTo(AccountingOffice, { foreignKey: 'accountingOfficeId' });
 
             await sequelize.sync();
         } catch (error) {

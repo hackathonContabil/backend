@@ -1,6 +1,9 @@
 const { Router } = require('express');
 const { normalizeName } = require('../helper');
-const { createAccountingOfficeValidation } = require('./accountingOfficeValidation');
+const {
+    createAccountingOfficeValidation,
+    listUsersValidation,
+} = require('./accountingOfficeValidation');
 const ensureAuthentication = require('./middlewares/ensureAuthentication');
 const ensureUserIsAdmin = require('./middlewares/ensureUserIsAdmin');
 
@@ -42,8 +45,25 @@ module.exports = class {
             return res.status(204).send();
         });
 
+        router.get(
+            '/',
+            ensureAuthentication,
+            ensureUserIsAdmin,
+            listUsersValidation,
+            async (req, res) => {
+                const { page, limit, filter } = req.query;
+
+                const { offices, count } = await this.listAccountingOfficesUsecase.execute({
+                    page,
+                    limit,
+                    filter,
+                });
+                return res.json({ status: 'success', data: { count, offices } });
+            }
+        );
+
         router.get('/public', async (_, res) => {
-            const offices = await this.listAccountingOfficesUsecase.execute({});
+            const { offices } = await this.listAccountingOfficesUsecase.execute({});
             const officesToReturn = offices.map(({ id, name }) => {
                 return { id, name };
             });

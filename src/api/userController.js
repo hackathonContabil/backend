@@ -140,8 +140,9 @@ module.exports = class {
             ensureUserIsAccountant,
             async (req, res) => {
                 const { id } = req.params;
+                const { accountingOfficeId } = req.user;
 
-                await this.activateUserUsecase.execute({ id, isClient: true });
+                await this.activateUserUsecase.execute({ id, isClient: true, accountingOfficeId });
                 return res.status(204).send();
             }
         );

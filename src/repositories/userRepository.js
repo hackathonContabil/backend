@@ -88,6 +88,7 @@ module.exports = class {
         const { count: total, rows: users } = await User.findAndCountAll({
             attributes: { exclude: ['password'] },
             limit,
+            include: 'AccountingOffice',
             offset: (limit || 0) * page,
             order: [
                 ['isAdmin', 'DESC'],

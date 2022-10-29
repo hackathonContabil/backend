@@ -16,7 +16,7 @@ module.exports = class {
 
     decryptData(users) {
         return users.map(({ phone, email, document, accountantLicense, ...data }) => {
-            return {
+            const formattedData = {
                 ...data,
                 phone: phone ? this.cryptoProvider.decrypt(phone) : null,
                 email: this.cryptoProvider.decrypt(email),
@@ -24,7 +24,14 @@ module.exports = class {
                 accountantLicense: accountantLicense
                     ? this.cryptoProvider.decrypt(accountantLicense)
                     : null,
+                accountingOfficeName: data['AccountingOffice.name'],
             };
+            delete formattedData['AccountingOffice.id'];
+            delete formattedData['AccountingOffice.name'];
+            delete formattedData['AccountingOffice.document'];
+            delete formattedData['AccountingOffice.createdAt'];
+            delete formattedData['AccountingOffice.updatedAt'];
+            return formattedData;
         });
     }
 };

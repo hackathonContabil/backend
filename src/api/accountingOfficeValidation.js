@@ -7,4 +7,12 @@ const createAccountingOfficeValidation = validate({
     },
 });
 
-module.exports = { createAccountingOfficeValidation };
+const listUsersValidation = validate({
+    query: {
+        page: joi.number().required().label('Página').min(0),
+        limit: joi.number().required().label('Limite').min(0),
+        filter: joi.string().label('Filtro').max(128),
+    },
+});
+
+module.exports = { createAccountingOfficeValidation, listUsersValidation };
