@@ -11,6 +11,7 @@ const ListAccountingOfficesUsecase = require('./usecases/accountingOffice/listAc
 const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAccountUsecase');
 const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const FillAccountsTransactionsReferencesUsecase = require('./usecases/bankAccount/fillAccountsTransactionsReferencesUsecase');
+const ListTransactionsUsecase = require('./usecases/bankAccount/listTransactionsUsecase');
 const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
 const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
@@ -160,18 +161,18 @@ module.exports = class AppLauncher {
         //  Bank account modules
         const connectBankAccountUsecase = new ConnectBankAccountUsecase(
             bankAccountRepository,
-            userRepository,
             cryptoProvider,
             bankAccountDataProvider
         );
-        const bankAccountController = new BankAccountController(connectBankAccountUsecase);
+        const listTransactionsUsecase = new ListTransactionsUsecase(
+            transactionsRepository,
+            userRepository
+        );
+        const bankAccountController = new BankAccountController(
+            connectBankAccountUsecase,
+            listTransactionsUsecase
+        );
         this.expressServer.use('/api/v1/bank-account', bankAccountController.router());
-
-        // File modules
-        const exportTransactionsDataSpreadsheetUsecase =
-            new ExportTransactionsDataSpreadsheetUsecase(tokenProvider, spreadsheetProvider);
-        const fileController = new FileController(exportTransactionsDataSpreadsheetUsecase);
-        this.expressServer.use('/api/v1/file', fileController.router());
 
         const fillAccountsTransactionsReferencesUsecase =
             new FillAccountsTransactionsReferencesUsecase(
@@ -184,5 +185,11 @@ module.exports = class AppLauncher {
             fillAccountsTransactionsReferencesUsecase
         );
         bankAccountScheduler.init();
+
+        // File modules
+        const exportTransactionsDataSpreadsheetUsecase =
+            new ExportTransactionsDataSpreadsheetUsecase(tokenProvider, spreadsheetProvider);
+        const fileController = new FileController(exportTransactionsDataSpreadsheetUsecase);
+        this.expressServer.use('/api/v1/file', fileController.router());
     }
 };
