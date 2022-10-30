@@ -67,25 +67,13 @@ module.exports = class {
             }
         });
 
-        const data = [];
         let smIn = 0;
         let smOut = 0;
+        const data = [];
         for (const dateAndTypeKey in transactionsPerDay) {
             let currentLine = {};
             const transactions = transactionsPerDay[dateAndTypeKey];
             for (const transaction of transactions) {
-                if (
-                    currentLine['Data Entrada'] &&
-                    currentLine['Descrição Entrada'] &&
-                    currentLine['Valor de Entrada'] &&
-                    currentLine['Data Saída'] &&
-                    currentLine['Descrição Saída'] &&
-                    currentLine['Valor de Saída']
-                ) {
-                    data.push(currentLine);
-                    currentLine = {};
-                }
-
                 const [date, type] = dateAndTypeKey.split('-');
                 if (transaction > 0) {
                     currentLine['Data Entrada'] = date;
@@ -98,8 +86,8 @@ module.exports = class {
                     currentLine['Valor de Saída'] = transaction;
                     smOut += transaction;
                 }
+                data.push(currentLine);
             }
-            data.push(currentLine);
         }
         data.push({
             ['Data Entrada']: 'TOTAL',

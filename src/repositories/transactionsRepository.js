@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const Transactions = require('../models/transactions');
 
 module.exports = class {
@@ -8,7 +9,7 @@ module.exports = class {
     async list(page = 0, limit, { userId, from, to }, asc = false) {
         const filters = { userId };
         if (to && from) {
-            filters['transactionDate'] = { [Op.between]: [startDate, endDate] };
+            filters['transactionDate'] = { [Op.between]: [from, to] };
         } else if (from) {
             filters['transactionDate'] = { [Op.gte]: from };
         } else if (to) {
