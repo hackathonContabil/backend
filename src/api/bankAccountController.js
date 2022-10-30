@@ -10,11 +10,13 @@ module.exports = class {
         exportTransactionsDataSpreadsheetUsecase,
         connectBankAccountUsecase,
         listTransactionsUsecase,
+        getBalanceUsecase,
         bankAccountDataProvider
     ) {
         this.exportTransactionsDataSpreadsheetUsecase = exportTransactionsDataSpreadsheetUsecase;
         this.connectBankAccountUsecase = connectBankAccountUsecase;
         this.listTransactionsUsecase = listTransactionsUsecase;
+        this.getBalanceUsecase = getBalanceUsecase;
         this.bankAccountDataProvider = bankAccountDataProvider;
     }
 
@@ -24,6 +26,12 @@ module.exports = class {
         router.get('/', ensureAuthentication, ensureUserIsClient, async (_, res) => {
             const banks = this.bankAccountDataProvider.getBanks();
             return res.json({ status: 'success', data: banks });
+        });
+
+        router.get('/balance', ensureAuthentication, ensureUserIsClient, async (req, res) => {
+            const { id: userId } = req.user;
+            const balance = await this.getBalanceUsecase.execute(userId);
+            return res.status(200).json({ status: 'success', data: { balance } });
         });
 
         router.get(

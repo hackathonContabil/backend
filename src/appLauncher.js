@@ -12,6 +12,7 @@ const ConnectBankAccountUsecase = require('./usecases/bankAccount/connectBankAcc
 const ExportTransactionsDataSpreadsheetUsecase = require('./usecases/bankAccount/exportTransactionsDataSpreadsheetUsecase');
 const FillAccountsTransactionsReferencesUsecase = require('./usecases/bankAccount/fillAccountsTransactionsReferencesUsecase');
 const ListTransactionsUsecase = require('./usecases/bankAccount/listTransactionsUsecase');
+const GetBalanceUsecase = require('./usecases/bankAccount/getBalanceUsecase');
 const ActivateUserUsecase = require('./usecases/user/activateUserUsecase');
 const AllowToShareBankAccountDataUsecase = require('./usecases/user/allowToShareBankAccountDataUsecase');
 const AuthenticateUserUsecase = require('./usecases/user/authenticateUserUsecase');
@@ -171,6 +172,7 @@ module.exports = class AppLauncher {
             cryptoProvider,
             bankAccountDataProvider
         );
+        const getBalanceUsecase = new GetBalanceUsecase(transactionsRepository);
         const listTransactionsUsecase = new ListTransactionsUsecase(
             transactionsRepository,
             userRepository
@@ -179,6 +181,7 @@ module.exports = class AppLauncher {
             exportTransactionsDataSpreadsheetUsecase,
             connectBankAccountUsecase,
             listTransactionsUsecase,
+            getBalanceUsecase,
             bankAccountDataProvider
         );
         this.expressServer.use('/api/v1/bank-account', bankAccountController.router());
