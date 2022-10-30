@@ -1,4 +1,4 @@
-const { formatDate } = require('../../helper');
+const { formatDate, formatNumber } = require('../../helper');
 
 module.exports = class {
     constructor(transactionsRepository, userRepository, tokenProvider, spreadsheetProvider) {
@@ -42,8 +42,8 @@ module.exports = class {
                     transaction.amount > 0 ? 'Recebimentos' : 'Pagamento',
                 'Descrição do realizador': transaction.payerName,
                 Documento: transaction.payerDocument,
-                'Valor da Operação': transaction.amount,
-                Saldo: transaction.balance,
+                'Valor da Operação': formatNumber(transaction.amount),
+                Saldo: formatNumber(transaction.balance),
             };
         });
     }
@@ -66,7 +66,6 @@ module.exports = class {
                 transactionsPerDay[dateAndTypeKey].push(transaction.amount);
             }
         });
-
         let smIn = 0;
         let smOut = 0;
         const data = [];
@@ -78,12 +77,12 @@ module.exports = class {
                 if (transaction > 0) {
                     currentLine['Data Entrada'] = date;
                     currentLine['Descrição Entrada'] = type;
-                    currentLine['Valor de Entrada'] = transaction;
+                    currentLine['Valor de Entrada'] = formatNumber(transaction);
                     smIn += transaction;
                 } else {
                     currentLine['Data Saída'] = date;
                     currentLine['Descrição Saída'] = type;
-                    currentLine['Valor de Saída'] = transaction;
+                    currentLine['Valor de Saída'] = formatNumber(transaction);
                     smOut += transaction;
                 }
                 data.push(currentLine);
@@ -91,12 +90,12 @@ module.exports = class {
         }
         data.push({
             ['Data Entrada']: 'TOTAL',
-            ['Valor de Saída']: smOut,
-            ['Valor de Entrada']: smIn,
+            ['Valor de Saída']: formatNumber(smOut),
+            ['Valor de Entrada']: formatNumber(smIn),
         });
         data.push({
             ['Descrição Saída']: 'Saldo Final em Caixa',
-            ['Valor de Saída']: smIn + smOut,
+            ['Valor de Saída']: formatNumber(smIn + smOut),
         });
         return data;
     }
