@@ -39,10 +39,14 @@ module.exports = class {
     }
 
     async getTransactionsReferenceByConnector(connector) {
-        const {
-            results: [account],
-        } = await this.client.fetchAccounts(connector);
-        return account.id;
+        try {
+            const {
+                results: [account],
+            } = await this.client.fetchAccounts(connector);
+            return account.id;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     async getTransactions(transactionsReference) {
