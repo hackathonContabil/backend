@@ -46,6 +46,26 @@ module.exports = class {
             }
         );
 
+        router.get(
+            '/export/cash-flow/:id',
+            ensureAuthentication,
+            ensureUserIsAccountant,
+            async (req, res) => {
+                const { from, to } = req.query;
+                const { id: userId } = req.params;
+
+                const spreadsheet = await this.exportTransactionsDataSpreadsheetUsecase.execute({
+                    from,
+                    to,
+                    userId,
+                    accountingOfficeId: req.user.accountingOfficeId,
+                    type: 'cash-flow',
+                });
+                const fileName = `dados-${Date.now()}.csv`;
+                return res.attachment(fileName).send(spreadsheet);
+            }
+        );
+
         router.post('/', ensureAuthentication, ensureUserIsClient, async (req, res) => {
             const { bank, credentials } = req.body;
 

@@ -1,4 +1,5 @@
 const BadRequestError = require('../../errors/badRequestError');
+const { formatDate } = require('../../helper');
 
 module.exports = class {
     constructor(transactionsRepository, userRepository) {
@@ -20,7 +21,7 @@ module.exports = class {
         }
         const { count, transactions } = await this.transactionsRepository.list(page, limit, filter);
         const formattedTransactions = transactions.map((transaction) => {
-            const formattedDate = transaction.transactionDate.toLocaleDateString();
+            const formattedDate = formatDate(transaction.transactionDate);
             return {
                 id: transaction.id,
                 date: formattedDate,

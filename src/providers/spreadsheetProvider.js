@@ -18,4 +18,19 @@ module.exports = class {
         const spreadsheet = parse(transactions, options);
         return spreadsheet;
     }
+
+    cashFlowSpreadsheet(transactions) {
+        const options = {
+            fields: [
+                'Data Entrada',
+                'Descrição Entrada',
+                'Valor de Entrada',
+                'Data Saída',
+                'Descrição Saída',
+                'Valor de Saída',
+            ],
+        };
+        const spreadsheet = parse(transactions, options);
+        return spreadsheet;
+    }
 };

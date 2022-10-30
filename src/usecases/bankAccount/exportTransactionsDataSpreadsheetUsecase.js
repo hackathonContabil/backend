@@ -1,3 +1,5 @@
+const { formatDate } = require('../../helper');
+
 module.exports = class {
     constructor(transactionsRepository, userRepository, tokenProvider, spreadsheetProvider) {
         this.transactionsRepository = transactionsRepository;
@@ -15,19 +17,22 @@ module.exports = class {
         switch (type) {
             case 'banking-reconciliation':
                 data = await this.bankingReconciliation({ userId, from, to });
+                return this.spreadsheetProvider.bankingReconciliationSpreadsheet(data);
+            case 'cash-flow':
+                data = await this.cashFlow({ userId, from, to });
+                return this.spreadsheetProvider.cashFlowSpreadsheet(data);
         }
-        const spreadsheet = this.spreadsheetProvider.bankingReconciliationSpreadsheet(data);
-        return spreadsheet;
     }
 
     async bankingReconciliation(filter) {
         const { transactions } = await this.transactionsRepository.list(
             undefined,
             undefined,
-            filter
+            filter,
+            true
         );
         return transactions.map((transaction) => {
-            const formattedDate = transaction.transactionDate.toLocaleDateString();
+            const formattedDate = formatDate(transaction.transactionDate);
             return {
                 Data: formattedDate,
                 'Tipo de Operação': transaction.description,
@@ -41,5 +46,70 @@ module.exports = class {
                 Saldo: transaction.balance,
             };
         });
+    }
+
+    async cashFlow(filter) {
+        const { transactions } = await this.transactionsRepository.list(
+            undefined,
+            undefined,
+            filter,
+            true
+        );
+        const transactionsPerDay = {};
+
+        transactions.forEach((transaction) => {
+            const formattedDate = formatDate(transaction.transactionDate);
+            const dateAndTypeKey = `${formattedDate}-${transaction.description}`;
+            if (!transactionsPerDay[dateAndTypeKey]) {
+                transactionsPerDay[dateAndTypeKey] = [transaction.amount];
+            } else {
+                transactionsPerDay[dateAndTypeKey].push(transaction.amount);
+            }
+        });
+
+        const data = [];
+        let smIn = 0;
+        let smOut = 0;
+        for (const dateAndTypeKey in transactionsPerDay) {
+            let currentLine = {};
+            const transactions = transactionsPerDay[dateAndTypeKey];
+            for (const transaction of transactions) {
+                if (
+                    currentLine['Data Entrada'] &&
+                    currentLine['Descrição Entrada'] &&
+                    currentLine['Valor de Entrada'] &&
+                    currentLine['Data Saída'] &&
+                    currentLine['Descrição Saída'] &&
+                    currentLine['Valor de Saída']
+                ) {
+                    data.push(currentLine);
+                    currentLine = {};
+                }
+
+                const [date, type] = dateAndTypeKey.split('-');
+                if (transaction > 0) {
+                    currentLine['Data Entrada'] = date;
+                    currentLine['Descrição Entrada'] = type;
+                    currentLine['Valor de Entrada'] = transaction;
+                    smIn += transaction;
+                } else {
+                    currentLine['Data Saída'] = date;
+                    currentLine['Descrição Saída'] = type;
+                    currentLine['Valor de Saída'] = transaction;
+                    smOut += transaction;
+                }
+            }
+            data.push(currentLine);
+        }
+        data.push({
+            ['Data Entrada']: 'TOTAL',
+            ['Valor de Saída']: smOut,
+            ['Valor de Entrada']: smIn,
+        });
+        data.push({
+            ['Descrição Saída']: 'Saldo Final em Caixa',
+            ['Valor de Saída']: smIn + smOut,
+        });
+        return data;
     }
 };

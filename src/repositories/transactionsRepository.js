@@ -5,7 +5,7 @@ module.exports = class {
         await Transactions.bulkCreate(data);
     }
 
-    async list(page = 0, limit, { userId, from, to }) {
+    async list(page = 0, limit, { userId, from, to }, asc = false) {
         const filters = { userId };
         if (to && from) {
             filters['transactionDate'] = { [Op.between]: [startDate, endDate] };
@@ -17,7 +17,7 @@ module.exports = class {
         const { count: total, rows: transactions } = await Transactions.findAndCountAll({
             limit,
             offset: (limit || 0) * page,
-            order: [['transactionDate', 'DESC']],
+            order: [['transactionDate', asc ? 'ASC' : 'DESC']],
             raw: true,
             where: filters,
         });
